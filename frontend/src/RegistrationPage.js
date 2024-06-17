@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Navbar from './Navbar';
+import { serverURL } from './config';
 
 function RegistrationPage() {
   const [email, setEmail] = useState('');
@@ -13,7 +14,7 @@ function RegistrationPage() {
       return;
     }
     try {
-      const response = await fetch('http://localhost:8000/users/signup', {
+      const response = await fetch(`${serverURL}/users/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

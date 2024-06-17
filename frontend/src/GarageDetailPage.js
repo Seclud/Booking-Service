@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
+import { serverURL } from './config';
 
 function GarageDetailPage() {
   const [service, setService] = useState(null);
@@ -10,7 +11,7 @@ function GarageDetailPage() {
 
   useEffect(() => {
     const token = localStorage.getItem('authToken');
-    fetch(`http://localhost:8000/carservices/${serviceId}`, {
+    fetch(`${serverURL}/carservices/${serviceId}`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -23,7 +24,7 @@ function GarageDetailPage() {
     .catch(error => console.error('Error fetching data:', error));
 
     // Fetch lifts for the service
-    fetch(`http://localhost:8000/lifts/${serviceId}`, { // Adjust the URL as needed
+    fetch(`${serverURL}/lifts/${serviceId}`, { // Adjust the URL as needed
         headers: {
             'Authorization': `Bearer ${token}`
         }

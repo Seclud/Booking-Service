@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Navbar from './Navbar';
+import { serverURL } from './config';
 
 function LiftCreationPage() {
   const [liftName, setLiftName] = useState('');
@@ -10,7 +11,7 @@ function LiftCreationPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('authToken');
-    const response = await fetch(`http://localhost:8000/lifts/`, {
+    const response = await fetch(`${serverURL}/lifts/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

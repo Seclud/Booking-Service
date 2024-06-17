@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './Navbar';
+import { serverURL } from './config';
 
 function BookingsPage() {
   const [bookings, setBookings] = useState([]);
@@ -7,7 +8,7 @@ function BookingsPage() {
 
   useEffect(() => {
     const token = localStorage.getItem('authToken');
-    fetch('http://localhost:8000/bookings/my/all', {
+    fetch(`${serverURL}/bookings/my/all`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -38,7 +39,7 @@ function BookingsPage() {
       const token = localStorage.getItem('authToken');
       const isConfirmed = window.confirm('Are you sure you want to cancel this booking?');
       if (isConfirmed) {
-      fetch(`http://localhost:8000/bookings/${bookingId}`, {
+      fetch(`${serverURL}/bookings/${bookingId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Navbar from './Navbar';
 import ReactSelect from 'react-select';
+import { serverURL } from './config';
 
 function BookingForm() {
   const { liftId } = useParams();
@@ -18,7 +19,7 @@ function BookingForm() {
 
   useEffect(() => {
     const fetchServices = async () => {
-      const response = await fetch('http://localhost:8000/services');
+      const response = await fetch(`${serverURL}/services`);
       const data = await response.json();
       setServices(data);
     };
@@ -61,7 +62,7 @@ function BookingForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-        const response = await fetch('http://localhost:8000/bookings/', {
+        const response = await fetch(`${serverURL}/bookings/`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

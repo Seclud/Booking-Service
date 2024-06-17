@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import Navbar from './Navbar';
+import { serverURL } from './config';
 
 function LoginPage() {
   const [username, setName] = useState('');
@@ -21,7 +22,7 @@ function LoginPage() {
       body.append('username', username);
       body.append('password', password);
   
-      const response = await fetch('http://localhost:8000/login/access-token', {
+      const response = await fetch(`${serverURL}/login/access-token`, {
         method: 'POST',
         headers: headers,
         body: body,

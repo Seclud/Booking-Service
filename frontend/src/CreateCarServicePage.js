@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
+import { serverURL } from './config';
 
 function CreateCarServicePage() {
   const [name, setName] = useState('');
@@ -13,7 +14,7 @@ function CreateCarServicePage() {
     const service = { name, description };
 
     try {
-      const response = await fetch('http://localhost:8000/carservices/', {
+      const response = await fetch(`${serverURL}/carservices/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

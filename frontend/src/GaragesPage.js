@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from './Navbar';
-import { Link, useNavigate  } from 'react-router-dom'; 
+import { Link, useNavigate  } from 'react-router-dom';
+import { serverURL } from './config';
 
 function CarServicesPage() {
   const [services, setServices] = useState([]);
@@ -14,7 +15,7 @@ function CarServicesPage() {
   
   useEffect(() => {
     const token = localStorage.getItem('authToken');
-    fetch('http://localhost:8000/users/me', {
+    fetch(`${serverURL}/users/me`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -25,7 +26,7 @@ function CarServicesPage() {
     })
     .catch(error => console.error('Error fetching user data:', error));
 
-    fetch('http://localhost:8000/carservices/', {
+    fetch(`${serverURL}/carservices/`, {
       headers: {
         'Authorization': `Bearer ${token}` // Adjust according to how your backend expects the token
       }
@@ -44,7 +45,7 @@ function CarServicesPage() {
     const token = localStorage.getItem('authToken');
     const isConfirmed = window.confirm('Are you sure you want to delete this service?');
     if (isConfirmed) {
-      fetch(`http://localhost:8000/carservices/${serviceId}`, {
+      fetch(`${serverURL}/carservices/${serviceId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
