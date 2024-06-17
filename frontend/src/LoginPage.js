@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import Navbar from './Navbar';
-import { serverURL } from './config';
+import { serverURL } from './config.js';
 
 function LoginPage() {
   const [username, setName] = useState('');

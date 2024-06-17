@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './Navbar';
-import { serverURL } from './config';
+import { serverURL } from './config.js';
 
 function BookingsPage() {
   const [bookings, setBookings] = useState([]);

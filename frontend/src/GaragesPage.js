@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from './Navbar';
 import { Link, useNavigate  } from 'react-router-dom';
-import { serverURL } from './config';
+import { serverURL } from './config.js';
 
 function CarServicesPage() {
   const [services, setServices] = useState([]);

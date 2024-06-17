@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Navbar from './Navbar';
 import ReactSelect from 'react-select';
-import { serverURL } from './config';
+import { serverURL } from './config.js';
 
 function BookingForm() {
   const { liftId } = useParams();

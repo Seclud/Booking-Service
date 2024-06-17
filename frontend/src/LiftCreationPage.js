@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Navbar from './Navbar';
-import { serverURL } from './config';
+import { serverURL } from './config.js';
 
 function LiftCreationPage() {
   const [liftName, setLiftName] = useState('');

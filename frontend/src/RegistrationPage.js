@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Navbar from './Navbar';
-import { serverURL } from './config';
+import { serverURL } from './config.js';
 
 function RegistrationPage() {
   const [email, setEmail] = useState('');

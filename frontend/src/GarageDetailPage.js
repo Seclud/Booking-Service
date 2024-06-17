@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
-import { serverURL } from './config';
+import { serverURL } from './config.js';
 
 function GarageDetailPage() {
   const [service, setService] = useState(null);
