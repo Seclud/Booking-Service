@@ -5,6 +5,8 @@ services:
     container_name: db_app
     env_file:
       - .env
+    ports:
+      - "5432:5432" 
 
   rabbitmq:
     image: rabbitmq:3.10.7-management
@@ -18,6 +20,8 @@ services:
     container_name: redis_app
     command:
       --port 5379
+    ports:
+      - "5379:5379" 
     env_file:
       - .env 
 
