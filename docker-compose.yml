@@ -48,6 +48,7 @@ services:
       - db
       - rabbitmq
       - redis
+      - app
     env_file:
       - .env
 
@@ -61,6 +62,7 @@ services:
       - db
       - rabbitmq
       - redis
+      - app
     env_file:
       - .env
 
@@ -72,6 +74,7 @@ services:
       - 5555:5555
     depends_on:
       - celery
+      - app
     env_file:
       - .env
 
