@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import Navbar from './Navbar';
 import ReactSelect from 'react-select';
 import { serverURL } from './config.js';
+import { addMinutes, formatISO, parseISO } from 'date-fns';
 
 function BookingForm() {
   const { liftId } = useParams();
@@ -31,16 +32,23 @@ function BookingForm() {
       const service = services.find(service => service.id === serviceId);
       return acc + (service ? service.duration : 0);
     }, 0);
+
     if (bookingData.time_from) {
-      const timeFrom = new Date(bookingData.time_from);
-      if (!isNaN(timeFrom.getTime())) {
-        const timezoneOffset = timeFrom.getTimezoneOffset() * 60000;
-        const timeTo = new Date(timeFrom.getTime() + totalDuration * 60000 - timezoneOffset);
-        const formattedTimeTo = timeTo.toISOString().slice(0, 16);
-        setBookingData({ ...bookingData, time_to: formattedTimeTo, services: selectedServiceIds });
+        const timeFrom = new Date(bookingData.time_from);
+        // const timezoneOffset = timeFrom.getTimezoneOffset() * 60000;
+        // const timeTo = new Date(timeFrom.getTime() + totalDuration * 60000 - timezoneOffset);
+        // const formattedTimeTo = timeTo.toISOString().slice(0, -1);
+        // console.log(timeTo, formattedTimeTo, timezoneOffset)
+        // setBookingData({ ...bookingData, time_to: formattedTimeTo, services: selectedServiceIds });
+        // const timeFrom = parseISO(bookingData.time_from);
+        const timeTo = addMinutes(timeFrom, totalDuration);
+        const formattedTimeTo = formatISO(timeTo, { representation: 'complete' });
+        const formattedTimeToCorrected = formattedTimeTo.slice(0, 19)
+        console.log(timeFrom, timeTo, formattedTimeToCorrected)
+        setBookingData({ ...bookingData, time_to: formattedTimeToCorrected, services: selectedServiceIds });
       }
     }
-  };
+  ;
 
   const handleChange = (selectedOptions) => {
     const newSelectedServiceIds = selectedOptions.map(option => parseInt(option.value));
