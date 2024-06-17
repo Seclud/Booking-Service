@@ -8,6 +8,7 @@ COPY ./requirements.txt /app/requirements.txt
 
 RUN pip install --no-cache-dir -r requirements.txt
 
+ENV PYTHONPATH=/app
 
 COPY ./app /app/app
 COPY start.sh /app/
