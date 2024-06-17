@@ -3,6 +3,9 @@ services:
   db:
     image: postgres:16
     container_name: db_app
+    env_file:
+      - .env
+
   rabbitmq:
     image: rabbitmq:3.10.7-management
     ports:
@@ -55,7 +58,8 @@ services:
       - rabbitmq
       - redis
     env_file:
-      - .env 
+      - .env
+
   flower:
     build: .
     container_name: celery_flower
