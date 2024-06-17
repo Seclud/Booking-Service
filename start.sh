@@ -1,4 +1,5 @@
 #!/bin/bash
+echo "PYTHONPATH: $PYTHONPATH"
 # Run initial data script
 python /app/app/initial_data.py
 # Start the application
