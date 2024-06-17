@@ -16,7 +16,7 @@ app = Celery('tasks', broker=f'pyamqp://{settings.RABBIT_USER}:{settings.RABBIT_
 def send_email(email_data):
     msg = MIMEText(email_data["body"])
     msg["Subject"] = email_data["subject"]
-    msg["From"] = settings.EMAILS_FROM_NAME
+    msg["From"] = settings.EMAILS_FROM_EMAIL
     msg["To"] = email_data["to"]
 
     try:
