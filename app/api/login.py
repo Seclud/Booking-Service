@@ -17,13 +17,12 @@ router = APIRouter()
 @router.post('/login/access-token')
 def login_access_token(response: Response, session: SessionDep,
                        form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> Token:
-    print(f"Attempting login with : {form_data}")
     user = crud.user.authenticate(session=session, email=form_data.username, password=form_data.password)
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect email or password")
     elif not user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
-    access_token_expires = timedelta(minutes=15)
+    access_token_expires = timedelta(days=1)
     refresh_token_expires = timedelta(days=30)
     access_token = security.create_access_token(user.id, expires_delta=access_token_expires)
     refresh_token = security.create_refresh_token(user.id, expires_delta=refresh_token_expires)
@@ -39,7 +38,6 @@ def test_token(current_user: CurrentUser):
     return current_user
 
 
-#Сделать, что когда access expires и выдается ошибка на вход, то вызывается этот refresh
 @router.post('/token/refresh', response_model=Token, response_model_exclude_none=True)
 def refresh_token(refresh_token: str):
     user_id = decode_refresh_token(refresh_token)
