@@ -38,11 +38,11 @@ def get_current_user(session: SessionDep, token: TokenDep) -> User:
         if payload["type"] != "access":
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Could not validate credentials, refresh token")
+                detail="Could not validate credentials")
     except (InvalidTokenError, ValidationError):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Could not validate credentials, exception",
+            detail="Could not validate credentials",
         )
     user = session.get(User, token_data.sub)
     if not user:
