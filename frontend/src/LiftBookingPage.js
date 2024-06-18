@@ -10,6 +10,7 @@ function BookingForm() {
   const [services, setServices] = useState([]);
   const [selectedServiceIds, setSelectedServiceIds] = useState([]);
   const options = services.map(service => ({ value: service.id, label: `${service.description} (${service.duration} минут)` }));
+  const [errorMessage, setErrorMessage] = useState('');
 
   const [bookingData, setBookingData] = useState({
     lift_id: liftId,
@@ -45,7 +46,7 @@ function BookingForm() {
         const formattedTimeTo = formatISO(timeTo, { representation: 'complete' });
         const formattedTimeToCorrected = formattedTimeTo.slice(0, 19)
         console.log(timeFrom, timeTo, formattedTimeToCorrected)
-        setBookingData({ ...bookingData, time_to: formattedTimeToCorrected, services: selectedServiceIds });
+        setBookingData({ ...bookingData, time_to: formattedTimeToCorrected });
       }
     }
   ;
@@ -77,16 +78,27 @@ function BookingForm() {
               // Assuming you have a way to get the current user's auth token
               'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
             },
-            body: JSON.stringify(bookingData),
+            body: JSON.stringify({
+              booking: {
+                status: "await_confirm",
+                time_from: bookingData.time_from,
+                time_to: bookingData.time_to,
+                lift_id: parseInt(bookingData.lift_id),
+              },
+              service_ids: selectedServiceIds,
+            }),
       });
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        const errorData = await response.json();
+        const errorMessage = errorData.detail || 'An error occurred while creating the booking.';
+        throw new Error(errorMessage);
       }
-      console.log('Booking created successfully:', response.data);
+      setErrorMessage('');
+      console.log('Booking created successfully:', await response.data);
       // Handle success (e.g., show a success message, redirect, etc.)
     } catch (error) {
-      console.error('Error creating booking:', error.detail);
-      // Handle error (e.g., show error message)
+      console.error('Error creating booking:', error.message);
+      setErrorMessage(error.message);
     }
   };
 
@@ -134,6 +146,7 @@ function BookingForm() {
         </label>
       </div>
       <button className= "bookingform" type="submit" style={{ marginTop: '20px' }}>Create Booking</button>
+      {errorMessage && <div style={{color: 'red'}}>{errorMessage}</div>}
     </form>
   );
 }

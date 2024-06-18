@@ -72,13 +72,19 @@ function BookingsPage() {
         <Navbar />
         <h1>My Bookings</h1>
         <div id="bookings">
-          {bookings.map((booking, index) => (
-            <div key={booking.id}>
-              Бронирование {index + 1}, C {formatDateTime(booking.time_from)}; До {formatDateTime(booking.time_to)}
-              <button onClick={() => handleCancelBooking(booking.id)}>Cancel</button>
-            </div>
-          ))}
+      {bookings.map((booking, index) => (
+        <div key={booking.booking.id}>
+          Бронирование {index + 1}, C {formatDateTime(booking.booking.time_from)}; До {formatDateTime(booking.booking.time_to)}
+          <div>Services:</div>
+          <ul>
+            {booking.services.map(service => (
+              <li key={service.id}>{service.description} (Duration: {service.duration} minutes)</li>
+            ))}
+          </ul>
+          <button onClick={() => handleCancelBooking(booking.booking.id)}>Cancel</button>
         </div>
+      ))}
+    </div>
       </div>
     );
   }
