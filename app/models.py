@@ -1,5 +1,5 @@
 from sqlmodel import SQLModel, Field, Relationship, DateTime
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 
 '''USER MODELS'''
@@ -127,6 +127,11 @@ class BookingCreate(BookingBase):
 class BookingUpdate(BookingBase):
     pass
 
+class BookingServices(SQLModel, table=True):
+    booking_id: int = Field(foreign_key="booking.id", primary_key=True)
+    service_id: int = Field(foreign_key="services.id", primary_key=True)
+    booking: Optional["Booking"] = Relationship(back_populates="booking_services")
+    service: Optional["Services"] = Relationship(back_populates="booking_services")
 
 class Booking(BookingBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -134,12 +139,17 @@ class Booking(BookingBase, table=True):
     owner_id: int = Field(default=None, foreign_key="user.id", nullable=False)
     lift_id: int = Field(default=None, foreign_key="lift.id", nullable=False)
     lift: Optional[Lift] = Relationship(back_populates="bookings")
+    booking_services: List["BookingServices"] = Relationship(back_populates="booking")
 
 
 class Services(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     description: str = Field(default=None, nullable=False)
     duration: int = Field(default=None, nullable=False)
+    booking_services: List["BookingServices"] = Relationship(back_populates="service")
+
+
+
 
 
 # class LiftBooking(SQLModel, table=True):
