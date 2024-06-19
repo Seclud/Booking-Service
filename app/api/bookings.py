@@ -17,7 +17,6 @@ router = APIRouter()
 
 
 @router.get("/admin/all", dependencies=[Depends(get_current_active_superuser)])
-@cache(expire=60)
 def read_all_bookings(session: SessionDep, current_user: CurrentUser):
     statement = (
         select(Booking, Services)
@@ -41,7 +40,6 @@ def read_all_bookings(session: SessionDep, current_user: CurrentUser):
 
 
 @router.get("/admin/{user_id}", dependencies=[Depends(get_current_active_superuser)])
-@cache(expire=60)
 def read_bookings(session: SessionDep, user_id: int, current_user: CurrentUser):
     statement = select(Booking).where(Booking.owner_id == user_id)
     bookings = session.exec(statement).all()
@@ -49,7 +47,6 @@ def read_bookings(session: SessionDep, user_id: int, current_user: CurrentUser):
 
 
 @router.get("/my/all")
-@cache(expire=60)
 def read_my_bookings(session: SessionDep, current_user: CurrentUser):
 
     statement = (
