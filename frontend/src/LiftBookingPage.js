@@ -16,7 +16,6 @@ function BookingForm() {
     lift_id: liftId,
     time_from: '',
     time_to: '',
-    //services: [],
   });
 
   useEffect(() => {
@@ -36,12 +35,6 @@ function BookingForm() {
 
     if (bookingData.time_from) {
         const timeFrom = new Date(bookingData.time_from);
-        // const timezoneOffset = timeFrom.getTimezoneOffset() * 60000;
-        // const timeTo = new Date(timeFrom.getTime() + totalDuration * 60000 - timezoneOffset);
-        // const formattedTimeTo = timeTo.toISOString().slice(0, -1);
-        // console.log(timeTo, formattedTimeTo, timezoneOffset)
-        // setBookingData({ ...bookingData, time_to: formattedTimeTo, services: selectedServiceIds });
-        // const timeFrom = parseISO(bookingData.time_from);
         const timeTo = addMinutes(timeFrom, totalDuration);
         const formattedTimeTo = formatISO(timeTo, { representation: 'complete' });
         const formattedTimeToCorrected = formattedTimeTo.slice(0, 19)
@@ -65,7 +58,7 @@ function BookingForm() {
   useEffect(() => {
     if (bookingData.time_from) {
       calculateAndSetTimeTo(selectedServiceIds);
-    } // This effect should run only when bookingData.time_from changes
+    }
   }, [bookingData.time_from]);
 
   const handleSubmit = async (e) => {
@@ -105,7 +98,6 @@ function BookingForm() {
   return (
     //display: 'flex', flexDirection: 'column', alignItems: 'center', 
     <form onSubmit={handleSubmit}>
-      <Navbar />
       <div className= "bookingform" style={{ margin: '10px 0' }}>
         <label>
           Lift ID:

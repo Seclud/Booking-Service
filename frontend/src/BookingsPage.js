@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './Navbar';
+import {Button, Center, Group, Loader, Paper, Stack, Text, Title} from '@mantine/core';
 import { serverURL } from './config.js';
+import styles from './BookingsPage.module.css'
 
 function BookingsPage() {
   const [bookings, setBookings] = useState([]);
@@ -16,14 +18,15 @@ function BookingsPage() {
       }
     })
     .then(response => response.json())
-    .then(data => {setBookings(data); setIsLoading(false);})
-    .catch(error => {console.error('Error fetching bookings:', error); setIsLoading(false);});
+    .then(data => {
+      setBookings(data); 
+      setIsLoading(false);
+    })
+    .catch(error => {
+      console.error('Error fetching bookings:', error); 
+      setIsLoading(false);
+    });
   }, []);
-
-  // const formatDateTime = (dateTimeStr) => {
-  //   const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-  //   return new Date(dateTimeStr).toLocaleDateString(undefined, options);
-  // };
 
     const formatDateTime = (dateTimeStr) => {
       const date = new Date(dateTimeStr);
@@ -58,35 +61,86 @@ function BookingsPage() {
     }
     };
 
-    if (isLoading) { 
-      return <div>
-        <Navbar />
-        <h1>My Bookings</h1>
-        <div>Loading...</div>;
-      </div>
+  //   if (isLoading) { 
+  //     return <div>
+  //       <Navbar />
+  //       <h1>My Bookings</h1>
+  //       <div>Loading...</div>;
+  //     </div>
        
-    }
+  //   }
 
-    return (
-      <div>
-        <Navbar />
-        <h1>My Bookings</h1>
-        <div id="bookings">
-      {bookings.map((booking, index) => (
-        <div key={booking.booking.id}>
-          Бронирование {index + 1}, C {formatDateTime(booking.booking.time_from)}; До {formatDateTime(booking.booking.time_to)}
-          <div>Services:</div>
-          <ul>
-            {booking.services.map(service => (
-              <li key={service.id}>{service.description} (Duration: {service.duration} minutes)</li>
+  //   return (
+  //     <div>
+  //       <Navbar />
+  //       <h1>My Bookings</h1>
+  //       <div id="bookings">
+  //     {bookings.map((booking, index) => (
+  //       <div key={booking.booking.id}>
+  //         Бронирование {index + 1}, C {formatDateTime(booking.booking.time_from)}; До {formatDateTime(booking.booking.time_to)}
+  //         <div>Services:</div>
+  //         <ul>
+  //           {booking.services.map(service => (
+  //             <li key={service.id}>{service.description} (Duration: {service.duration} minutes)</li>
+  //           ))}
+  //         </ul>
+  //         <button onClick={() => handleCancelBooking(booking.booking.id)}>Cancel</button>
+  //       </div>
+  //     ))}
+  //   </div>
+  //     </div>
+  //   );
+  // }
+
+  return (
+    <div className={styles.container}>
+        <Title order={1} ta="center" mt="md" mb={50}>
+            Мои записи бронирований
+        </Title>
+        <Stack
+            align="stretch"
+            justify="center"
+            gap="md"
+            id='bookings'
+        >
+            {
+                isLoading &&
+                <Center>
+                    <Loader/>
+                </Center>
+            }
+            {!isLoading && bookings && bookings.map((booking, index) => (
+                <Paper shadow="md" radius="md" p="xl" key={booking.booking.id} withBorder>
+                    <Title order={3} ta="center">Бронирование {index + 1}</Title>
+                    <Stack
+                        align="stretch"
+                        justify="center"
+                        gap="xs"
+                    >
+                        <Group>
+                            <Text fw={600}>Начало обслуживания: </Text>
+                            <Text>{formatDateTime(booking.booking.time_from)}</Text>
+                        </Group>
+                        <Group>
+                            <Text fw={600}>Конец обслуживания: </Text>
+                            <Text>{formatDateTime(booking.booking.time_to)}</Text>
+                        </Group>
+                    </Stack>
+
+                    <Text fw={600}>Услуги: </Text>
+                    <ul style={{marginTop: 0}}>
+                        {booking.services.map(service => (
+                            <li key={service.id}>{service.description} (Продолжительность: {service.duration} минут)</li>
+                        ))}
+                    </ul>
+                    <Button color="red" onClick={() => handleCancelBooking(booking.booking.id)}>
+                        Отменить запись
+                    </Button>
+                </Paper>
             ))}
-          </ul>
-          <button onClick={() => handleCancelBooking(booking.booking.id)}>Cancel</button>
-        </div>
-      ))}
+        </Stack>
     </div>
-      </div>
-    );
-  }
+);
+}
 
 export default BookingsPage;
