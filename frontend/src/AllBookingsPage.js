@@ -3,10 +3,14 @@ import Navbar from './Navbar';
 import {Button, Center, Group, Loader, Paper, Stack, Text, Title} from '@mantine/core';
 import { serverURL } from './config.js';
 import styles from './BookingsPage.module.css'
+import BookingUpdateModal from "./components/BookingUpdateModal.jsx";
+import { set } from 'date-fns';
 
 function BookingsPage() {
   const [bookings, setBookings] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [bookingIsOpen, setBookingIsOpen] = useState(false);
+  const [bookingId, setbookingId] = useState(0);
 
   useEffect(() => {
     const token = localStorage.getItem('authToken');
@@ -61,6 +65,27 @@ function BookingsPage() {
     }
     };
 
+    const handleUpdateBooking = (bookingId, updatedBookingData) => {
+        const token = localStorage.getItem('authToken');
+        fetch(`${serverURL}/bookings/${bookingId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(updatedBookingData)
+        })
+        .then(response => {
+          if (response.ok) {
+            // Optionally, fetch all bookings again or update the state locally
+            console.log('Booking updated successfully');
+          } else {
+            console.error('Failed to update booking');
+          }
+        })
+        .catch(error => console.error('Error updating booking:', error));
+      };
+
   //   if (isLoading) { 
   //     return <div>
   //       <Navbar />
@@ -91,6 +116,7 @@ function BookingsPage() {
   //     </div>
   //   );
   // }
+  
 
   return (
     <div className={styles.container}>
@@ -140,9 +166,13 @@ function BookingsPage() {
                     <Button color="red" onClick={() => handleCancelBooking(booking.booking.id)}>
                         Отменить запись
                     </Button>
-                    <Button color="yellow" ml="10" onClick={() => handleCancelBooking(booking.booking.id)}>
+                    <Button color="yellow" ml="10" onClick={() => {
+                        setBookingIsOpen(true)
+                        setbookingId(booking.booking.id)
+                        }}>
                         Изменить запись
                     </Button>
+                    <BookingUpdateModal isOpen={bookingIsOpen} setIsOpen={setBookingIsOpen} bookingId={bookingId}/>
                 </Paper>
             ))}
         </Stack>
