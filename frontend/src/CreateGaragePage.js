@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from './Navbar';
 import { serverURL } from './config.js';
 
 function CreateCarServicePage() {
@@ -37,7 +36,6 @@ function CreateCarServicePage() {
 
   return (
     <div>
-      <Navbar />
       <h1>Create New CarService</h1>
       <form onSubmit={handleSubmit}>
         <div>
