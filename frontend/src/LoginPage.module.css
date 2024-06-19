@@ -1,0 +1,19 @@
+.wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-size: cover;
+    background-position: center center;
+    overflow: hidden;
+}
+
+.form {
+    min-height: 900px;
+    max-width: 450px;
+    padding-top: 80px;
+    @media (max-width: 48em) {
+        max-width: 100%;
+        border-right: none; 
+    }
+}
