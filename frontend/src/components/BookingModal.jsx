@@ -9,7 +9,7 @@ import ReactSelect from 'react-select';
 
 
 export default function BookingModal(props) {
-    const navigate = useNavigate()
+    const navigate = useNavigate();
     const [services, setServices] = useState([]);
     const [selectedServiceIds, setSelectedServiceIds] = useState([]);
     const options = services.map(service => ({
@@ -72,6 +72,11 @@ export default function BookingModal(props) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            const selectedServiceDescriptions = services
+                .filter(service => selectedServiceIds.includes(service.id))
+                .map(service => service.description)
+                .join(', ');
+
             const response = await fetch(`${serverURL}/bookings/`, {
                 method: 'POST',
                 headers: {
@@ -95,9 +100,26 @@ export default function BookingModal(props) {
             }
             setErrorMessage('');
             console.log('Booking created successfully:', await response.data);
+            
             notifications.show({
-                title: 'Вы успешно забронировали подъёмник',
+                title: 'Вы успешно записались',
+                message: (
+                    <div>
+                      Вы записаны на {new Date(bookingData.time_from).toLocaleDateString()} С {new Date(bookingData.time_from).toLocaleTimeString()}  до {new Date(bookingData.time_to).toLocaleTimeString()}<br />
+                      На выбранные услуги: {selectedServiceDescriptions} <br />
+                      Запись можно отменить в "Мои записи"
+                    </div>
+                  ),
+                color:'green',
+                autoClose:15000
             })
+
+            setBookingData({
+                lift_id: '',
+                time_from: '',
+                time_to: '',
+            });
+
             props.setIsOpen(false)
         } catch (error) {
             console.error('Error creating booking:', error.message);

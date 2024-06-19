@@ -22,22 +22,23 @@ import Layout from './components/Layout';
 function App() {
   return (
     <MantineProvider>
+      <Notifications />
       <AuthProvider>
         <Router>
-          <Routes>
-            <Route element={<Layout />}>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/registration" element={<RegistrationPage />} />
-              <Route path="/garages" element={<GaragesPage />} />
-              <Route path="/garage/:id" element={<GarageDetailPage/>} />
-              <Route path="/book/lift/:liftId" element={<LiftBookingPage />} />
-              <Route path="/bookings" element={<BookingsPage />} />
-              <Route path="/garage/create" element={<CreateGaragePage />} />
-              <Route path="/lifts/create/:serviceId" element={<LiftCreationPage />} />
-              <Route path="/all-bookings" element={<AllBookingsPage />} />            
-            </Route>
-          </Routes>
+            <Routes>
+              <Route element={<Layout />}>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/registration" element={<RegistrationPage />} />
+                <Route path="/garages" element={<GaragesPage />} />
+                <Route path="/garage/:id" element={<GarageDetailPage/>} />
+                <Route path="/book/lift/:liftId" element={<LiftBookingPage />} />
+                <Route path="/bookings" element={<BookingsPage />} />
+                <Route path="/garage/create" element={<CreateGaragePage />} />
+                <Route path="/lifts/create/:serviceId" element={<LiftCreationPage />} />
+                <Route path="/all-bookings" element={<AllBookingsPage />} />            
+              </Route>
+            </Routes>
         </Router>
       </AuthProvider>
     </MantineProvider>
