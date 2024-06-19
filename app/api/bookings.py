@@ -19,9 +19,25 @@ router = APIRouter()
 @router.get("/admin/all", dependencies=[Depends(get_current_active_superuser)])
 @cache(expire=60)
 def read_all_bookings(session: SessionDep, current_user: CurrentUser):
-    statement = select(Booking)
-    bookings = session.exec(statement).all()
-    return bookings
+    statement = (
+        select(Booking, Services)
+        .join(BookingServices, BookingServices.booking_id == Booking.id)
+        .join(Services, Services.id == BookingServices.service_id)
+    )
+    results = session.exec(statement).all()
+
+    bookings_with_services = {}
+    for booking, service in results:
+        if booking.id not in bookings_with_services:
+            bookings_with_services[booking.id] = {
+                "booking": booking,
+                "services": []
+            }
+        bookings_with_services[booking.id]["services"].append(service)
+
+    bookings_list = list(bookings_with_services.values())
+
+    return bookings_list
 
 
 @router.get("/admin/{user_id}", dependencies=[Depends(get_current_active_superuser)])
