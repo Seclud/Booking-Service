@@ -1,5 +1,7 @@
+from datetime import timezone
 from typing import List
 
+from zoneinfo import ZoneInfo
 import redis.asyncio as redis
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi_cache import FastAPICache
@@ -75,7 +77,11 @@ def create_booking(session: SessionDep, booking: BookingCreate, current_user: Cu
     if not service_ids:
         raise HTTPException(status_code=400, detail="Услуги не выбраны, выберите хотя бы одну услугу")
 
-    if booking.time_from > booking.time_to:
+    target_timezone = ZoneInfo('Europe/Moscow')
+    time_from_aware = booking.time_from.replace(tzinfo=timezone.utc).astimezone(target_timezone)
+    time_to_aware = booking.time_to.replace(tzinfo=timezone.utc).astimezone(target_timezone)
+
+    if time_from_aware > time_to_aware:
         raise HTTPException(status_code=400, detail="Время конца должно быть больше времени начала")
 
     lift = get_lift(session, booking.lift_id)
@@ -117,11 +123,24 @@ def create_booking(session: SessionDep, booking: BookingCreate, current_user: Cu
     return db_booking
 
 
-@router.put("/{id}", dependencies=[Depends(get_current_active_superuser)])
+@router.put("/{id}")
 def update_booking(session: SessionDep, id: int, booking: BookingUpdate, current_user: CurrentUser,
                    service_ids: List[int]):
     db_booking = session.get(Booking, id)
-    for key, value in booking.dict().items():
+    if not db_booking:
+        raise HTTPException(status_code=404, detail="Запись не найдена")
+
+    if current_user.id != db_booking.owner_id:
+        raise HTTPException(status_code=400, detail="Вы не можете редактировать чужие записи")
+
+    target_timezone = ZoneInfo('Europe/Moscow')
+    time_from_aware = booking.time_from.replace(tzinfo=timezone.utc).astimezone(target_timezone)
+    time_to_aware = booking.time_to.replace(tzinfo=timezone.utc).astimezone(target_timezone)
+    if time_from_aware >= time_to_aware:
+        raise HTTPException(status_code=400, detail="Время конца должно быть больше времени начала")
+
+    update_data = booking.dict(exclude_unset=True)
+    for key, value in update_data.items():
         setattr(db_booking, key, value)
     session.add(db_booking)
 
