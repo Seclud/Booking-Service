@@ -16,7 +16,6 @@ from fastapi_cache.backends.redis import RedisBackend
 import redis.asyncio as redis
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.database import engine
-from starlette_admin.contrib.sqla import Admin, ModelView
 from app.models import User, CarService, Lift, Booking, Services
 from .core.config import settings
 from app.api.deps import SessionDep
@@ -58,12 +57,3 @@ def get_services(session: SessionDep):
     statement = select(Services)
     services = session.exec(statement).all()
     return services
-
-
-admin = Admin(engine, title="Example")
-admin.add_view(ModelView(User))
-admin.add_view(ModelView(CarService))
-admin.add_view(ModelView(Lift))
-admin.add_view(ModelView(Booking))
-admin.add_view(ModelView(Services))
-admin.mount_to(app)
