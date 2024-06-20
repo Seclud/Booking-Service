@@ -179,7 +179,7 @@ function BookingsPage() {
                             ))}
                         </ul>
                         <Button color="red" onClick={() => handleCancelBooking(booking.booking.id)}>
-                            Отменить запись
+                            Удалить запись
                         </Button>
                         <Button color="yellow" ml="10" onClick={() => {
                             handleBookingSelect(booking.booking.id)
