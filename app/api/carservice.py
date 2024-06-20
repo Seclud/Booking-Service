@@ -1,7 +1,7 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from sqlmodel import func, select
 
-from app.api.deps import CurrentUser, SessionDep
+from app.api.deps import CurrentUser, SessionDep, get_current_active_superuser
 from app.models import CarService, CarServiceCreate, CarServicePublic, CarServicesPublic, CarServiceUpdate, Message, \
     Lift, Booking
 
@@ -34,7 +34,7 @@ def read_service(session: SessionDep, current_user: CurrentUser, id: int):
     return service
 
 
-@router.post("/", response_model=CarServicePublic)
+@router.post("/", response_model=CarServicePublic, dependencies=[Depends(get_current_active_superuser)])
 def create_service(*, session: SessionDep, current_user: CurrentUser, service_in: CarServiceCreate):
     service = CarService.model_validate(service_in, update={"owner_id": current_user.id})
     session.add(service)
