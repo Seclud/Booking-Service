@@ -15,6 +15,7 @@ def read_services(session: SessionDep, skip: int = 0, limit: int = 100):
         .select_from(CarService)
     )
     count = session.exec(count_statement).one()
+
     statement = (
         select(CarService)
         .offset(skip)
@@ -29,7 +30,7 @@ def read_services(session: SessionDep, skip: int = 0, limit: int = 100):
 def read_service(session: SessionDep, current_user: CurrentUser, id: int):
     service = session.get(CarService, id)
     if not service:
-        raise HTTPException(status_code=404, detail="CarService not found")
+        raise HTTPException(status_code=404, detail="Автосервис не найден")
     return service
 
 
@@ -46,9 +47,10 @@ def create_service(*, session: SessionDep, current_user: CurrentUser, service_in
 def update_service(*, session: SessionDep, current_user: CurrentUser, id: int, service_in: CarServiceUpdate):
     service = session.get(CarService, id)
     if not service:
-        raise HTTPException(status_code=404, detail="CarService not found")
+        raise HTTPException(status_code=404, detail="Автосервис не найден")
     if not current_user.is_superuser and (service.owner_id != current_user.id):
-        raise HTTPException(status_code=400, detail="Not enough permissions")
+        raise HTTPException(status_code=400, detail="Недостаточно прав")
+
     update_dict = service_in.model_dump(exclude_unset=True)
     service.sqlmodel_update(update_dict)
     session.add(service)
@@ -61,9 +63,9 @@ def update_service(*, session: SessionDep, current_user: CurrentUser, id: int, s
 def delete_service(session: SessionDep, current_user: CurrentUser, id: int) -> Message:
     service = session.get(CarService, id)
     if not service:
-        raise HTTPException(status_code=404, detail="CarService not found")
+        raise HTTPException(status_code=404, detail="Автосервис не найден")
     if not current_user.is_superuser and (service.owner_id != current_user.id):
-        raise HTTPException(status_code=400, detail="Not enough permissions")
+        raise HTTPException(status_code=400, detail="Недостаточно прав")
 
     lifts = session.query(Lift).filter(Lift.carservice_id == id).all()
     for lift in lifts:
@@ -72,4 +74,4 @@ def delete_service(session: SessionDep, current_user: CurrentUser, id: int) -> M
 
     session.delete(service)
     session.commit()
-    return Message(message="Service deleted successfully")
+    return Message(message="Автосервис удалён успешно")

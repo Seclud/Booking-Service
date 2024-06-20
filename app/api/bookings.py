@@ -157,7 +157,7 @@ def update_booking(session: SessionDep, id: int, booking: BookingUpdate, current
     formatted_time = ";".join(f"С {time[0]} до {time[1]}" for time in booked_times)
 
     if existing_bookings:
-        raise HTTPException(status_code=400, detail=f"Подъемник уже занят в этот день {formatted_time}")
+        raise HTTPException(status_code=400, detail=f"Пост уже занят в этот день {formatted_time}")
 
     current_service_ids = set(
         session.exec(select(BookingServices.service_id).where(BookingServices.booking_id == id)).all())
