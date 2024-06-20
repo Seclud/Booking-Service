@@ -53,7 +53,6 @@ class UsersPublic(SQLModel):
     count: int
 
 
-####################################
 '''CAR MODELS'''
 
 
@@ -88,7 +87,6 @@ class CarServicesPublic(SQLModel):
     count: int
 
 
-####################################
 '''LIFT MODELS'''
 
 
@@ -127,11 +125,13 @@ class BookingCreate(BookingBase):
 class BookingUpdate(BookingBase):
     pass
 
+
 class BookingServices(SQLModel, table=True):
     booking_id: int = Field(foreign_key="booking.id", primary_key=True)
     service_id: int = Field(foreign_key="services.id", primary_key=True)
     booking: Optional["Booking"] = Relationship(back_populates="booking_services")
     service: Optional["Services"] = Relationship(back_populates="booking_services")
+
 
 class Booking(BookingBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -147,6 +147,7 @@ class Services(SQLModel, table=True):
     description: str = Field(default=None, nullable=False)
     duration: int = Field(default=None, nullable=False)
     booking_services: List["BookingServices"] = Relationship(back_populates="service")
+
 
 class Message(SQLModel):
     message: str

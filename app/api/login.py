@@ -18,9 +18,9 @@ def login_access_token(response: Response, session: SessionDep,
                        form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> Token:
     user = crud.user.authenticate(session=session, email=form_data.username, password=form_data.password)
     if not user:
-        raise HTTPException(status_code=400, detail="Incorrect email or password")
+        raise HTTPException(status_code=400, detail="Неправильные почта или пароль")
     elif not user.is_active:
-        raise HTTPException(status_code=400, detail="Inactive user")
+        raise HTTPException(status_code=400, detail="Пользователь не подтвердил почту")
 
     access_token_expires = timedelta(days=1)
     refresh_token_expires = timedelta(days=30)

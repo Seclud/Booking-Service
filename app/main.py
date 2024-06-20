@@ -1,24 +1,17 @@
 from contextlib import asynccontextmanager
-from datetime import datetime, timezone
 from typing import AsyncIterator
 
-import jwt
-from fastapi import FastAPI, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from sqlmodel import select
-from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.requests import Request
-from starlette.responses import Response
-
-from app.api import users, login, carservice, lifts, bookings
+import redis.asyncio as redis
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
-import redis.asyncio as redis
-from fastapi.middleware.cors import CORSMiddleware
-from app.core.database import engine
-from app.models import User, CarService, Lift, Booking, Services
-from .core.config import settings
+from sqlmodel import select
+
+from app.api import users, login, carservice, lifts, bookings
 from app.api.deps import SessionDep
+from app.models import Services
+from .core.config import settings
 
 
 @asynccontextmanager
