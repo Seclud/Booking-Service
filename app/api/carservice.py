@@ -30,8 +30,6 @@ def read_service(session: SessionDep, current_user: CurrentUser, id: int):
     service = session.get(CarService, id)
     if not service:
         raise HTTPException(status_code=404, detail="CarService not found")
-    # if not current_user.is_superuser and (service.owner_id != current_user.id):
-    #     raise HTTPException(status_code=400, detail="Not enough permissions")
     return service
 
 
