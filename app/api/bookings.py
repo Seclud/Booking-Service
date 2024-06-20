@@ -89,7 +89,8 @@ def create_booking(session: SessionDep, booking: BookingCreate, current_user: Cu
         and_(
             Booking.lift_id == booking.lift_id,
             Booking.time_from < booking.time_to,
-            Booking.time_to > booking.time_from
+            Booking.time_to > booking.time_from,
+            Booking.status != "canceled"
         )
     )
     existing_bookings = session.exec(statement).all()
@@ -139,7 +140,8 @@ def update_booking(session: SessionDep, id: int, booking: BookingUpdate, current
             Booking.id != id,
             Booking.lift_id == db_booking.lift_id,
             Booking.time_from < booking.time_to,
-            Booking.time_to > booking.time_from
+            Booking.time_to > booking.time_from,
+            Booking.status != "canceled"
         )
     )
     existing_bookings = session.exec(statement).all()
