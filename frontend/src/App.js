@@ -18,6 +18,7 @@ import '@mantine/dates/styles.css';
 import '@mantine/notifications/styles.css';
 import {Notifications} from "@mantine/notifications";
 import Layout from './components/Layout';
+import EmailConfirmationPage from './EmailConfirmationPage';
 
 function App() {
   return (
@@ -36,7 +37,8 @@ function App() {
                 <Route path="/bookings" element={<BookingsPage />} />
                 <Route path="/garage/create" element={<CreateGaragePage />} />
                 <Route path="/lifts/create/:serviceId" element={<LiftCreationPage />} />
-                <Route path="/all-bookings" element={<AllBookingsPage />} />            
+                <Route path="/all-bookings" element={<AllBookingsPage />} />
+                <Route path="/email-confirmation/:confirmationToken" element={<EmailConfirmationPage />} />            
               </Route>
             </Routes>
         </Router>
