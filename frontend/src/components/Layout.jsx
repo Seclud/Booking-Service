@@ -1,5 +1,5 @@
 import React from 'react';
-import {AppShell, Button, Group} from '@mantine/core';
+import {AppShell, Button, Group, Text} from '@mantine/core';
 import styles from './Layout.module.css'
 import {Link, Outlet} from "react-router-dom";
 import {useAuth} from "../AuthContext";
@@ -11,9 +11,10 @@ export default function Layout() {
         <AppShell header={{height: 74}}>
             <AppShell.Header>
                 <div className={styles.header}>
-                    {/* <Link to="/garages">
-                        <img alt="logo" src={Logo} className={styles.logo}/>
-                    </Link> */}
+                     <Link to="/">
+                        {/* <img alt="logo" src={Logo} className={styles.logo}/> */}
+                        <Button variant="subtle" color="rgba(82, 82, 82, 1)" size="md">Главная</Button>
+                    </Link> 
                     {
                         isAuthenticated &&
                         <Group>
