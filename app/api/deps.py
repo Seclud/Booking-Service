@@ -11,8 +11,8 @@ from sqlmodel import Session
 from app.core import security
 from app.core.config import settings
 from app.core.database import engine
-from app.models import TokenPayload
-from app.models import User
+from app.models import TokenPayload, User
+
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"/login/access-token"
@@ -46,9 +46,9 @@ def get_current_user(session: SessionDep, token: TokenDep) -> User:
         )
     user = session.get(User, token_data.sub)
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail="Пользователь не найден")
     if not user.is_active:
-        raise HTTPException(status_code=400, detail="Inactive user")
+        raise HTTPException(status_code=400, detail="Пользователь не активировал почту")
     return user
 
 
@@ -58,6 +58,6 @@ CurrentUser = Annotated[User, Depends(get_current_user)]
 def get_current_active_superuser(current_user: CurrentUser) -> User:
     if not current_user.is_superuser:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions"
+            status_code=status.HTTP_403_FORBIDDEN, detail="Недостаточно прав"
         )
     return current_user

@@ -1,19 +1,14 @@
 from datetime import timezone
 from typing import List
-
 from zoneinfo import ZoneInfo
-import redis.asyncio as redis
+
 from fastapi import APIRouter, HTTPException, Depends
-from fastapi_cache import FastAPICache
 from sqlmodel import select, and_, delete
 
 from app.api.deps import CurrentUser, SessionDep, get_current_active_superuser
-from app.core.config import settings
-from app.models import Booking, BookingCreate, BookingUpdate, Message, Services, BookingServices
-from app.crud.lift import get_lift
 from app.core.celery_utils import send_booking_reminder
-
-from fastapi_cache.decorator import cache
+from app.crud.lift import get_lift
+from app.models import Booking, BookingCreate, BookingUpdate, Message, Services, BookingServices
 
 router = APIRouter()
 
@@ -86,7 +81,7 @@ def create_booking(session: SessionDep, booking: BookingCreate, current_user: Cu
 
     lift = get_lift(session, booking.lift_id)
     if not lift:
-        raise HTTPException(status_code=404, detail="Lift not found")
+        raise HTTPException(status_code=404, detail="Пост не найден")
 
     statement = select(Booking).where(
         and_(
@@ -106,7 +101,7 @@ def create_booking(session: SessionDep, booking: BookingCreate, current_user: Cu
     formatted_time = ";".join(f"С {time[0]} до {time[1]}" for time in booked_times)
 
     if existing_bookings:
-        raise HTTPException(status_code=400, detail=f"Подъемник уже занят в это число в это время {formatted_time}")
+        raise HTTPException(status_code=400, detail=f"Пост уже занят в это число в это время {formatted_time}")
 
     db_booking = Booking.model_validate(booking.model_dump(), update={"owner_id": current_user.id})
     session.add(db_booking)

@@ -1,15 +1,14 @@
 from datetime import timedelta
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Response, Cookie
-from fastapi.responses import HTMLResponse
+from fastapi import APIRouter, Depends, HTTPException, Response
 from fastapi.security import OAuth2PasswordRequestForm
 
-from app.core import security
-from app.models import NewPassword, Token, UsersPublic, Message, UserPublic
-from app.core.security import get_password_hash, confirm_token, create_access_token, decode_refresh_token
-from app.api.deps import CurrentUser, SessionDep, get_current_active_superuser
 from app import crud
+from app.api.deps import CurrentUser, SessionDep
+from app.core import security
+from app.core.security import create_access_token, decode_refresh_token
+from app.models import Token, UserPublic
 
 router = APIRouter()
 
@@ -22,10 +21,13 @@ def login_access_token(response: Response, session: SessionDep,
         raise HTTPException(status_code=400, detail="Incorrect email or password")
     elif not user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
+
     access_token_expires = timedelta(days=1)
     refresh_token_expires = timedelta(days=30)
+
     access_token = security.create_access_token(user.id, expires_delta=access_token_expires)
     refresh_token = security.create_refresh_token(user.id, expires_delta=refresh_token_expires)
+
     response.set_cookie(key="access_token", value=f"Bearer {access_token}", httponly=True)
     return Token(
         access_token=access_token,
