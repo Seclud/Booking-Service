@@ -89,18 +89,19 @@ export default function BookingModal(props) {
             }
             setErrorMessage('');
             //console.log('Booking created successfully:', await response.data);
-            
+
             notifications.show({
                 title: 'Вы успешно записались',
                 message: (
                     <div>
-                      Вы записаны на {new Date(bookingData.time_from).toLocaleDateString()} С {new Date(bookingData.time_from).toLocaleTimeString()}  до {new Date(bookingData.time_to).toLocaleTimeString()}<br />
-                      На выбранные услуги: {selectedServiceDescriptions} <br />
-                      Запись можно отменить в "Мои записи"
+                        Вы записаны
+                        на {new Date(bookingData.time_from).toLocaleDateString()} С {new Date(bookingData.time_from).toLocaleTimeString()} до {new Date(bookingData.time_to).toLocaleTimeString()}<br/>
+                        На выбранные услуги: {selectedServiceDescriptions} <br/>
+                        Запись можно отменить в "Мои записи"
                     </div>
-                  ),
-                color:'green',
-                autoClose:15000
+                ),
+                color: 'green',
+                autoClose: 15000
             })
 
             setBookingData({
@@ -132,9 +133,9 @@ export default function BookingModal(props) {
                     onChange={handleChange}
                 /> */}
                 <ReactSelect
-                options={options}
-                isMulti
-                onChange={handleChange}
+                    options={options}
+                    isMulti
+                    onChange={handleChange}
                 />
                 <DateTimePicker
                     label="Время начала"
@@ -148,7 +149,8 @@ export default function BookingModal(props) {
                     disabled
                 /> */}
                 <Text>
-                    Время окончания: {selectedServiceIds.length > 0 && bookingData.time_to ? new Date(bookingData.time_to).toLocaleString() : 'Выберите услуги и время начала'}
+                    Время
+                    окончания: {selectedServiceIds.length > 0 && bookingData.time_to ? new Date(bookingData.time_to).toLocaleString() : 'Выберите услуги и время начала'}
                 </Text>
 
                 {errorMessage &&

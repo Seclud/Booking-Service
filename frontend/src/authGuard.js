@@ -2,7 +2,7 @@ import React from 'react';
 import {Navigate, Outlet, useLocation} from 'react-router-dom';
 import {useAuth} from "./AuthContext";
 
-export default function AuthGuard () {
+export default function AuthGuard() {
     const {isAuthenticated} = useAuth();
     const location = useLocation();
 
@@ -11,7 +11,7 @@ export default function AuthGuard () {
             pathname: 'login',
             search: location.pathname,
         };
-        return <Navigate to={redirect} replace />;
+        return <Navigate to={redirect} replace/>;
     }
 
     return <Outlet/>;

@@ -14,35 +14,35 @@ export default function LifeCreateModal(props) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const token = localStorage.getItem('authToken');
-        const post = { name, carservice_id };
-    
+        const post = {name, carservice_id};
+
         try {
-          const response = await fetch(`${serverURL}/lifts/`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(post)
-          });
-    
-          if (!response.ok) {
-            throw new Error('Failed to create post');
-          }
-    
-          notifications.show({
-            title: 'Пост успешно создан',
-            message:`Пост ${name} успешно создан, обновите страницу`,
-            color:'green',
-            autoClose:15000
-        })
-            navigate('/garage/'+carservice_id);
+            const response = await fetch(`${serverURL}/lifts/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(post)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to create post');
+            }
+
+            notifications.show({
+                title: 'Пост успешно создан',
+                message: `Пост ${name} успешно создан, обновите страницу`,
+                color: 'green',
+                autoClose: 15000
+            })
+            navigate('/garage/' + carservice_id);
             props.setIsOpen(false);
         } catch (error) {
             console.error('Error creating post:', error);
             setErrorMessage(error.message);
         }
-      };
+    };
 
     return (
         <Modal opened={props.isOpen} onClose={() => props.setIsOpen(false)}>
@@ -57,7 +57,7 @@ export default function LifeCreateModal(props) {
                     placeholder="Введите название поста"
                     onChange={(e) => setName(e.target.value)}
                 />
-                
+
                 {errorMessage &&
                     <>
                         <Space h='md'/>

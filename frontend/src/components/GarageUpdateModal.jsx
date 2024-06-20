@@ -3,13 +3,13 @@ import {serverURL} from "../config";
 import {Button, Space, Text, TextInput, Title, Modal, Stack} from "@mantine/core";
 import {notifications} from "@mantine/notifications";
 import {useNavigate} from "react-router-dom";
-import { set } from 'date-fns';
+import {set} from 'date-fns';
 
 
 export default function GarageCreateModal(props) {
     const navigate = useNavigate();
     const [name, setName] = useState('');
-    const [description, setDescription] = useState( '');
+    const [description, setDescription] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [id, setId] = useState('')
 
@@ -22,35 +22,35 @@ export default function GarageCreateModal(props) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const token = localStorage.getItem('authToken');
-        const garage = { name, description };
-    
+        const garage = {name, description};
+
         try {
-          const response = await fetch(`${serverURL}/carservices/${id}`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(garage)
-          });
-    
-          if (!response.ok) {
-            throw new Error('Failed to create CarService');
-          }
-    
-          notifications.show({
-            title: 'Автосервис успешно изменен',
-            message:`Автосервис ${name} успешно изменен, обновите страницу`,
-            color:'green',
-            autoClose:15000
-        })
+            const response = await fetch(`${serverURL}/carservices/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(garage)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to create CarService');
+            }
+
+            notifications.show({
+                title: 'Автосервис успешно изменен',
+                message: `Автосервис ${name} успешно изменен, обновите страницу`,
+                color: 'green',
+                autoClose: 15000
+            })
             navigate('/garages');
             props.setIsOpen(false);
         } catch (error) {
             console.error('Error creating CarService:', error);
             setErrorMessage(error.message);
         }
-      };
+    };
 
 
     return (
@@ -65,15 +65,15 @@ export default function GarageCreateModal(props) {
                     label="Название"
                     placeholder="Введите название сервиса"
                     onChange={(e) => setName(e.target.value)}
-                    value= {name}
+                    value={name}
                 />
                 <TextInput
                     label="Описание"
                     placeholder="Введите описание сервиса"
                     onChange={(e) => setDescription(e.target.value)}
-                    value= {description}
+                    value={description}
                 />
-                
+
                 {errorMessage &&
                     <>
                         <Space h='md'/>

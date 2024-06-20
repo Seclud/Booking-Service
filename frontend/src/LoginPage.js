@@ -1,43 +1,43 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {Link, useNavigate} from "react-router-dom";
-import { useAuth } from './AuthContext';
-import { serverURL } from './config.js';
+import {useAuth} from './AuthContext';
+import {serverURL} from './config.js';
 import {Button, Group, Paper, PasswordInput, Space, Text, TextInput, Title} from "@mantine/core";
 import styles from './LoginPage.module.css'
 
 function LoginPage() {
-  const [username, setName] = useState('');
-  const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
-  const navigate = useNavigate();
+    const [username, setName] = useState('');
+    const [password, setPassword] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
+    const navigate = useNavigate();
 
-  const { login } = useAuth();
+    const {login} = useAuth();
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    try {
-      const headers = {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      };
-      const body = new URLSearchParams();
-      body.append('username', username);
-      body.append('password', password);
-  
-      const response = await fetch(`${serverURL}/login/access-token`, {
-        method: 'POST', headers: headers, body: body,
-      });
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        try {
+            const headers = {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            };
+            const body = new URLSearchParams();
+            body.append('username', username);
+            body.append('password', password);
 
-      if (!response.ok) throw new Error('Login failed');
+            const response = await fetch(`${serverURL}/login/access-token`, {
+                method: 'POST', headers: headers, body: body,
+            });
 
-      const data = await response.json();
+            if (!response.ok) throw new Error('Login failed');
 
-      localStorage.setItem('authToken', data.access_token);
-      login();
-    } catch (error) {
-      console.error('Login error:', error);
-      setErrorMessage('Login failed. Please check your credentials.');
-    }
-  };
+            const data = await response.json();
+
+            localStorage.setItem('authToken', data.access_token);
+            login();
+        } catch (error) {
+            console.error('Login error:', error);
+            setErrorMessage('Login failed. Please check your credentials.');
+        }
+    };
 
 //   return (
 //     <div>
@@ -59,53 +59,53 @@ function LoginPage() {
 //   );
 // }
 
-return (
-  <div className={styles.wrapper}>
-      <Paper className={styles.form} radius={0} p={30}>
-          <Title order={2} className={styles.title} ta="center" mt="md" mb={50}>
-              👋 C возвращением!
-          </Title>
+    return (
+        <div className={styles.wrapper}>
+            <Paper className={styles.form} radius={0} p={30}>
+                <Title order={2} className={styles.title} ta="center" mt="md" mb={50}>
+                    👋 C возвращением!
+                </Title>
 
-          <TextInput
-              label="Почта"
-              placeholder="hello@gmail.com"
-              size="md"
-              value={username}
-              onChange={(event) => setName(event.currentTarget.value)}
-          />
-          <PasswordInput
-              label="Пароль"
-              placeholder="******"
-              mt="md"
-              size="md"
-              value={password}
-              onChange={(event) => setPassword(event.currentTarget.value)}
-          />
+                <TextInput
+                    label="Почта"
+                    placeholder="hello@gmail.com"
+                    size="md"
+                    value={username}
+                    onChange={(event) => setName(event.currentTarget.value)}
+                />
+                <PasswordInput
+                    label="Пароль"
+                    placeholder="******"
+                    mt="md"
+                    size="md"
+                    value={password}
+                    onChange={(event) => setPassword(event.currentTarget.value)}
+                />
 
-          {
-              errorMessage &&
-              <>
-                  <Space h="md"/>
-                  <Text ta="center" c="red">{errorMessage}</Text>
-              </>
-          }
+                {
+                    errorMessage &&
+                    <>
+                        <Space h="md"/>
+                        <Text ta="center" c="red">{errorMessage}</Text>
+                    </>
+                }
 
-          <Button fullWidth mt="xl" size="md" onClick={(event) => handleSubmit(event)}>
-              Войти
-          </Button>
+                <Button fullWidth mt="xl" size="md" onClick={(event) => handleSubmit(event)}>
+                    Войти
+                </Button>
 
-          <Space h="md"/>
-          <Group justify="space-between">
-              <Text ta="space-between">
-                  Нет аккаунта?
-              </Text>
-              <Link to="/registration">
-                  <Button variant="transparent" size="md">Зарегистрироваться</Button>
-              </Link>
-          </Group>
-      </Paper>
-  </div>
-  );
+                <Space h="md"/>
+                <Group justify="space-between">
+                    <Text ta="space-between">
+                        Нет аккаунта?
+                    </Text>
+                    <Link to="/registration">
+                        <Button variant="transparent" size="md">Зарегистрироваться</Button>
+                    </Link>
+                </Group>
+            </Paper>
+        </div>
+    );
 }
 
 export default LoginPage;

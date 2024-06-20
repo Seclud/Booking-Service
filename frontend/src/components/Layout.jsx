@@ -11,10 +11,10 @@ export default function Layout() {
         <AppShell header={{height: 74}}>
             <AppShell.Header>
                 <div className={styles.header}>
-                     <Link to="/">
+                    <Link to="/garages">
                         {/* <img alt="logo" src={Logo} className={styles.logo}/> */}
                         <Button variant="subtle" color="rgba(82, 82, 82, 1)" size="md">Главная</Button>
-                    </Link> 
+                    </Link>
                     {
                         isAuthenticated &&
                         <Group>

@@ -1,8 +1,5 @@
 import React from 'react';
 import {Navigate} from "react-router-dom";
-import { Link } from 'react-router-dom';
-import { useAuth } from './AuthContext';
-import Navbar from './Navbar';
 
 function HomePage() {
     // const { isAuthenticated, logout } = useAuth();
