@@ -19,6 +19,8 @@ import '@mantine/notifications/styles.css';
 import {Notifications} from "@mantine/notifications";
 import Layout from './components/Layout';
 import EmailConfirmationPage from './EmailConfirmationPage';
+import AuthGuard from './authGuard';
+import NotAuthGuard from './notAuthGuard';
 
 function App() {
   return (
@@ -28,17 +30,22 @@ function App() {
         <Router>
             <Routes>
               <Route element={<Layout />}>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/registration" element={<RegistrationPage />} />
+                <Route element={<NotAuthGuard />}>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/registration" element={<RegistrationPage />} />           
+                </Route>
+                <Route path="/email-confirmation/:confirmationToken" element={<EmailConfirmationPage />} />
                 <Route path="/garages" element={<GaragesPage />} />
-                <Route path="/garage/:id" element={<GarageDetailPage/>} />
-                <Route path="/book/lift/:liftId" element={<LiftBookingPage />} />
-                <Route path="/bookings" element={<BookingsPage />} />
-                <Route path="/garage/create" element={<CreateGaragePage />} />
-                <Route path="/lifts/create/:serviceId" element={<LiftCreationPage />} />
-                <Route path="/all-bookings" element={<AllBookingsPage />} />
-                <Route path="/email-confirmation/:confirmationToken" element={<EmailConfirmationPage />} />            
+                <Route element={<AuthGuard />}>
+                    <Route path="/garages" element={<GaragesPage />} />
+                    <Route path="/garage/:id" element={<GarageDetailPage/>} />
+                    <Route path="/book/lift/:liftId" element={<LiftBookingPage />} />
+                    <Route path="/bookings" element={<BookingsPage />} />
+                    <Route path="/garage/create" element={<CreateGaragePage />} />
+                    <Route path="/lifts/create/:serviceId" element={<LiftCreationPage />} />
+                    <Route path="/all-bookings" element={<AllBookingsPage />} />               
+                </Route>            
               </Route>
             </Routes>
         </Router>

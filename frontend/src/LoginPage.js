@@ -33,7 +33,6 @@ function LoginPage() {
 
       localStorage.setItem('authToken', data.access_token);
       login();
-      navigate('/garages');
     } catch (error) {
       console.error('Login error:', error);
       setErrorMessage('Login failed. Please check your credentials.');
