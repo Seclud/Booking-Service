@@ -121,5 +121,13 @@ class Settings(BaseSettings):
     RABBIT_HOST: str
     RABBIT_PORT: int = 5672
 
+    ALGORITHM: str
+
+    SERVER_HOST: str
+    SERVER_PORT: str
+
+    FRONTEND_HOST: str
+    FRONTEND_PORT: str
+
 
 settings = Settings()
