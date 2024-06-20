@@ -3,6 +3,7 @@ import { serverURL } from './config.js';
 import {Button, Group, Paper, PasswordInput, Space, Text, TextInput, Title} from "@mantine/core";
 import {Link} from "react-router-dom";
 import styles from "./LoginPage.module.css";
+import { notifications } from '@mantine/notifications';
 
 function RegistrationPage() {
   const [email, setEmail] = useState('');
@@ -12,10 +13,17 @@ function RegistrationPage() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (password !== confirmPassword) {
-      alert('Passwords do not match');
+
+    if (!email.trim() || !password.trim()) {
+      setErrorMessage('Почта или пароль не могут быть пустыми');
       return;
     }
+  
+    if (password !== confirmPassword) {
+      setErrorMessage('Пароли не совпадают');
+      return;
+    }
+
     try {
       const response = await fetch(`${serverURL}/users/signup`, {
         method: 'POST',
@@ -24,14 +32,23 @@ function RegistrationPage() {
         },
         body: JSON.stringify({ email, password }),
       });
-      if (!response.ok) {
-        throw new Error('Registration failed');
-      }
       const data = await response.json();
-      console.log('Registration successful', data);
+      if (!response.ok) {
+        const errorMessage = data.detail || 'Registration failed';
+        throw new Error(errorMessage);
+      }
+      //console.log('Registration successful', data);
+      setErrorMessage('');
+      
+      notifications.show({
+        title: 'Аккаунт зарегистрирован',
+        message:`Вам на почту была отправлена ссылка, перейдите по ней, чтобы активировать аккаунт`,
+        color:'green',
+        autoClose:15000
+    })
     } catch (error) {
       console.error('Registration error:', error);
-      setErrorMessage(error)
+      setErrorMessage(error.message)
     }
   };
 

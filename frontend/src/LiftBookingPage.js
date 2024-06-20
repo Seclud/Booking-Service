@@ -38,7 +38,6 @@ function BookingForm() {
         const timeTo = addMinutes(timeFrom, totalDuration);
         const formattedTimeTo = formatISO(timeTo, { representation: 'complete' });
         const formattedTimeToCorrected = formattedTimeTo.slice(0, 19)
-        console.log(timeFrom, timeTo, formattedTimeToCorrected)
         setBookingData({ ...bookingData, time_to: formattedTimeToCorrected });
       }
     }
@@ -87,7 +86,7 @@ function BookingForm() {
         throw new Error(errorMessage);
       }
       setErrorMessage('');
-      console.log('Booking created successfully:', await response.data);
+      //console.log('Booking created successfully:', await response.data);
       // Handle success (e.g., show a success message, redirect, etc.)
     } catch (error) {
       console.error('Error creating booking:', error.message);
