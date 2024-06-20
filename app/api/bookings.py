@@ -1,6 +1,4 @@
-from datetime import timezone
 from typing import List
-from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, HTTPException, Depends
 from sqlmodel import select, and_, delete
@@ -9,9 +7,9 @@ from app.api.deps import CurrentUser, SessionDep, get_current_active_superuser
 from app.core.celery_utils import send_booking_reminder
 from app.crud.lift import get_lift
 from app.models import Booking, BookingCreate, BookingUpdate, Message, Services, BookingServices
+from app.utils.booking_utils import convert_to_timezone, validate_booking_times, check_existing_bookings
 
 router = APIRouter()
-
 
 @router.get("/admin/all", dependencies=[Depends(get_current_active_superuser)])
 def read_all_bookings(session: SessionDep, current_user: CurrentUser):
@@ -72,12 +70,10 @@ def create_booking(session: SessionDep, booking: BookingCreate, current_user: Cu
     if not service_ids:
         raise HTTPException(status_code=400, detail="Услуги не выбраны, выберите хотя бы одну услугу")
 
-    target_timezone = ZoneInfo('Europe/Moscow')
-    time_from_aware = booking.time_from.replace(tzinfo=timezone.utc).astimezone(target_timezone)
-    time_to_aware = booking.time_to.replace(tzinfo=timezone.utc).astimezone(target_timezone)
+    time_from_aware = convert_to_timezone(booking.time_from)
+    time_to_aware = convert_to_timezone(booking.time_to)
 
-    if time_from_aware > time_to_aware:
-        raise HTTPException(status_code=400, detail="Время конца должно быть больше времени начала")
+    validate_booking_times(time_from_aware, time_to_aware)
 
     lift = get_lift(session, booking.lift_id)
     if not lift:
@@ -90,18 +86,9 @@ def create_booking(session: SessionDep, booking: BookingCreate, current_user: Cu
             Booking.time_to > booking.time_from
         )
     )
-
     existing_bookings = session.exec(statement).all()
-    booked_times = []
-
-    for existing_booking in existing_bookings:
-        formatted_time_from = existing_booking.time_from.strftime("%H:%M")
-        formatted_time_to = existing_booking.time_to.strftime("%H:%M")
-        booked_times.append((formatted_time_from, formatted_time_to))
-    formatted_time = ";".join(f"С {time[0]} до {time[1]}" for time in booked_times)
-
-    if existing_bookings:
-        raise HTTPException(status_code=400, detail=f"Пост уже занят в это число в это время {formatted_time}")
+    
+    check_existing_bookings(existing_bookings)
 
     db_booking = Booking.model_validate(booking.model_dump(), update={"owner_id": current_user.id})
     session.add(db_booking)
@@ -121,6 +108,9 @@ def create_booking(session: SessionDep, booking: BookingCreate, current_user: Cu
 @router.put("/{id}")
 def update_booking(session: SessionDep, id: int, booking: BookingUpdate, current_user: CurrentUser,
                    service_ids: List[int]):
+    if not service_ids:
+        raise HTTPException(status_code=400, detail="Услуги не выбраны, выберите хотя бы одну услугу")
+
     db_booking = session.get(Booking, id)
     if not db_booking:
         raise HTTPException(status_code=404, detail="Запись не найдена")
@@ -128,16 +118,13 @@ def update_booking(session: SessionDep, id: int, booking: BookingUpdate, current
     if current_user.id != db_booking.owner_id and  not current_user.is_superuser:
         raise HTTPException(status_code=400, detail="Вы не можете редактировать чужие записи")
 
-    target_timezone = ZoneInfo('Europe/Moscow')
-    time_from_aware = booking.time_from.replace(tzinfo=timezone.utc).astimezone(target_timezone)
-    time_to_aware = booking.time_to.replace(tzinfo=timezone.utc).astimezone(target_timezone)
-    if time_from_aware >= time_to_aware:
-        raise HTTPException(status_code=400, detail="Время конца должно быть больше времени начала")
+    time_from_aware = convert_to_timezone(booking.time_from)
+    time_to_aware = convert_to_timezone(booking.time_to)
+    
+    validate_booking_times(time_from_aware, time_to_aware)
 
-    update_data = booking.dict(exclude_unset=True)
-    for key, value in update_data.items():
-        setattr(db_booking, key, value)
-    session.add(db_booking)
+    update_data = booking.model_dump(exclude_unset=True)
+    db_booking.sqlmodel_update(update_data)
 
     statement = select(Booking).where(
         and_(
@@ -148,16 +135,8 @@ def update_booking(session: SessionDep, id: int, booking: BookingUpdate, current
         )
     )
     existing_bookings = session.exec(statement).all()
-    booked_times = []
-
-    for existing_booking in existing_bookings:
-        formatted_time_from = existing_booking.time_from.strftime("%H:%M")
-        formatted_time_to = existing_booking.time_to.strftime("%H:%M")
-        booked_times.append((formatted_time_from, formatted_time_to))
-    formatted_time = ";".join(f"С {time[0]} до {time[1]}" for time in booked_times)
-
-    if existing_bookings:
-        raise HTTPException(status_code=400, detail=f"Пост уже занят в этот день {formatted_time}")
+    
+    check_existing_bookings(existing_bookings)
 
     current_service_ids = set(
         session.exec(select(BookingServices.service_id).where(BookingServices.booking_id == id)).all())
@@ -184,15 +163,15 @@ def update_booking(session: SessionDep, id: int, booking: BookingUpdate, current
 def cancel_booking(session: SessionDep, id: int, current_user: CurrentUser):
     booking = session.get(Booking, id)
     if not booking:
-        raise HTTPException(status_code=404, detail="Booking not found")
+        raise HTTPException(status_code=404, detail="Запись не найдена")
     if not current_user.is_superuser and (booking.owner_id != current_user.id):
-        raise HTTPException(status_code=403, detail="Not enough permissions")
+        raise HTTPException(status_code=403, detail="Недостаточно прав")
 
     session.execute(delete(BookingServices).where(BookingServices.booking_id == id))
 
     session.delete(booking)
     session.commit()
-    return Message(message="Booking canceled")
+    return Message(message="Запись отменена")
 
 
 @router.get("/{id}")
@@ -218,3 +197,4 @@ def get_booking_by_id(session: SessionDep, current_user: CurrentUser, id: int, )
     bookings_list = list(bookings_with_services.values())
 
     return bookings_list
+
