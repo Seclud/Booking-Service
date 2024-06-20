@@ -168,8 +168,8 @@ const BookingUpdateModal = ({isOpen, setIsOpen, bookingId, bookingDetails, servi
                         onChange={setStatus}
                         data={[
                             {value: 'await_confirm', label: 'Ожидает подтверждения'},
-                            {value: 'cancelled', label: 'Отменено'},
-                            {value: 'confirmed', label: 'Подтверждено'},
+                            {value: 'cancelled', label: 'Отменена'},
+                            {value: 'confirmed', label: 'Подтверждена'},
                         ]}
                     />
                 )}
