@@ -67,7 +67,7 @@ class CarServiceCreate(CarServiceBase):
 
 
 class CarServiceUpdate(CarServiceBase):
-    title: Optional[str] = None
+    pass
 
 
 class CarService(CarServiceBase, table=True):
@@ -147,18 +147,6 @@ class Services(SQLModel, table=True):
     description: str = Field(default=None, nullable=False)
     duration: int = Field(default=None, nullable=False)
     booking_services: List["BookingServices"] = Relationship(back_populates="service")
-
-
-
-
-
-# class LiftBooking(SQLModel, table=True):
-#     id: Optional[int] = Field(default=None, primary_key=True)
-#     lift_id: int = Field(default=None, foreign_key="lift.id", nullable=False)
-#     booking_id: int = Field(default=None, foreign_key="booking.id", nullable=False)
-#     lift: Optional[Lift] = Relationship(back_populates="bookings")
-#     booking: Optional[Booking] = Relationship(back_populates="lifts")
-
 
 class Message(SQLModel):
     message: str
