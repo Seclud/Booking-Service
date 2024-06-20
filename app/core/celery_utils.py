@@ -15,7 +15,7 @@ app = Celery('tasks', broker=f'pyamqp://{settings.RABBIT_USER}:{settings.RABBIT_
 @app.task
 def send_email(email_data):
     from_name = "Booking Service" 
-    from_email = "tihegr@rambler.com"
+    from_email = settings.SMTP_USER 
     msg = MIMEText(email_data["body"])
     msg["Subject"] = email_data["subject"]
     msg["From"] = f"{from_name} <{from_email}>"
