@@ -73,7 +73,7 @@ function GarageDetailPage() {
                 }
             })
                 .then(response => {
-                    if (response.ok) setServices(lifts.filter(lift => lift.id !== serviceId));
+                    if (response.ok) setLifts(lifts.filter(lift => lift.id !== liftId));
                     else console.error('Failed to delete service');
                     window.location.reload();
                 })
@@ -154,6 +154,7 @@ function GarageDetailPage() {
                               onClick={() => {
                                   setLiftId(lift.id)
                                   setBookingIsOpen(true)
+                                  console.log(services)
                               }}>
                             <Text ta="center">
                                 {lift.name}
