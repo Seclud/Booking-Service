@@ -115,7 +115,7 @@ function GarageDetailPage() {
                     </Title>
                     <Group align="center" justify="space-between">
                         <Title order={2}>
-                            Доступные посты
+                            Выберите услуги и время записи
                         </Title>
                         {isAdmin && (
                             <Stack

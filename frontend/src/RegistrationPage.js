@@ -37,7 +37,6 @@ function RegistrationPage() {
                 const errorMessage = data.detail || 'Registration failed';
                 throw new Error(errorMessage);
             }
-            //console.log('Registration successful', data);
             setErrorMessage('');
 
             notifications.show({
