@@ -12,7 +12,7 @@ export default function BookingModal(props) {
     const navigate = useNavigate();
     const [services, setServices] = useState(props.services);
     const [selectedServiceIds, setSelectedServiceIds] = useState([]);
-    const options = props.services.map(service => ({
+    const options = services.map(service => ({
         value: `${service.id}`,
         label: `${service.description} (${service.duration} минут)`
     }));
