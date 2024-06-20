@@ -3,17 +3,12 @@ from zoneinfo import ZoneInfo
 
 from fastapi import HTTPException
 
+target_timezone = 'Europe/Moscow'
 
-def convert_to_timezone(time, target_timezone='Europe/Moscow'):
+
+def convert_to_timezone(time, target_timezone):
     target_tz = ZoneInfo(target_timezone)
     return time.replace(tzinfo=timezone.utc).astimezone(target_tz)
-
-
-def validate_booking_times(time_from, time_to, target_timezone='Europe/Moscow'):
-    if time_from > time_to:
-        raise HTTPException(status_code=400, detail="Время конца должно быть больше времени начала")
-    if time_from < datetime.now(ZoneInfo(target_timezone)):
-        raise HTTPException(status_code=400, detail="Время начала не может быть в прошлом")
 
 
 def check_existing_bookings(existing_bookings):
