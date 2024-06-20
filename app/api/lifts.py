@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlmodel import select, and_
 
 from app.api.deps import CurrentUser, SessionDep, get_current_active_superuser
-from app.models import Lift, LiftCreate, LiftUpdate, Message
+from app.models import Lift, LiftCreate, LiftUpdate, Message, Booking
 
 router = APIRouter()
 
@@ -34,11 +34,16 @@ def update_lift(session: SessionDep, id: int, lift: LiftUpdate, current_user: Cu
 
 @router.delete("/{id}")
 def delete_lift(session: SessionDep, id: int, current_user: CurrentUser):
-    booking = session.get(Lift, id)
-    if not booking:
-        raise HTTPException(status_code=404, detail="Booking not found")
-    if not current_user.is_superuser and (booking.owner_id != current_user.id):
+    lift = session.get(Lift, id)
+    if not lift:
+        raise HTTPException(status_code=404, detail="Пост не найден")
+    if not current_user.is_superuser and (lift.owner_id != current_user.id):
         raise HTTPException(status_code=403, detail="Not enough permissions")
-    session.delete(booking)
+
+    bookings = session.exec(select(Booking).where(Booking.lift_id == id)).all()
+    for booking in bookings:
+        session.delete(booking)
+
+    session.delete(lift)
     session.commit()
     return Message(message="Lift removed")
