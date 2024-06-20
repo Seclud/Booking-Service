@@ -9,7 +9,7 @@ router = APIRouter()
 
 
 @router.get("/", response_model=CarServicesPublic)
-def read_services(current_user: CurrentUser, session: SessionDep, skip: int = 0, limit: int = 100):
+def read_services(session: SessionDep, skip: int = 0, limit: int = 100):
     count_statement = (
         select(func.count())
         .select_from(CarService)
@@ -30,8 +30,8 @@ def read_service(session: SessionDep, current_user: CurrentUser, id: int):
     service = session.get(CarService, id)
     if not service:
         raise HTTPException(status_code=404, detail="CarService not found")
-    if not current_user.is_superuser and (service.owner_id != current_user.id):
-        raise HTTPException(status_code=400, detail="Not enough permissions")
+    # if not current_user.is_superuser and (service.owner_id != current_user.id):
+    #     raise HTTPException(status_code=400, detail="Not enough permissions")
     return service
 
 
