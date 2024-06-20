@@ -125,7 +125,7 @@ def update_booking(session: SessionDep, id: int, booking: BookingUpdate, current
     if not db_booking:
         raise HTTPException(status_code=404, detail="Запись не найдена")
 
-    if current_user.id != db_booking.owner_id:
+    if current_user.id != db_booking.owner_id and  not current_user.is_superuser:
         raise HTTPException(status_code=400, detail="Вы не можете редактировать чужие записи")
 
     target_timezone = ZoneInfo('Europe/Moscow')
@@ -168,7 +168,7 @@ def update_booking(session: SessionDep, id: int, booking: BookingUpdate, current
 
     for service_id in services_to_remove:
         session.execute(
-            delete(BookingServices).where(BookingServices.booking_id == id, BookingServices.service_id == service_id))
+             delete(BookingServices).where(BookingServices.booking_id == id, BookingServices.service_id == service_id))
 
     for service_id in services_to_add:
         new_booking_service = BookingServices(booking_id=id, service_id=service_id)
