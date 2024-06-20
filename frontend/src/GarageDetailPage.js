@@ -6,6 +6,8 @@ import {Button, Card, Center, Group, Loader, SimpleGrid, Space, Stack, Text, Tit
 import BookingModal from "./components/BookingModal.jsx";
 import {useAuth} from "./AuthContext.js"
 import styles from "./GaragePage.module.css";
+import LiftModal from "./components/LiftCreateModal.jsx"
+import LiftUpdateModal from "./components/LiftUpdateModal.jsx"
 
 function GarageDetailPage() {
   const [service, setService] = useState(null);
@@ -16,6 +18,10 @@ function GarageDetailPage() {
   const {isAdmin} = useAuth()
   const [isLoading, setIsLoading] = useState(true)
   const [bookingIsOpen, setBookingIsOpen] = useState(false);
+  const [services, setServices] = useState([]);
+  const [liftIsOpen, setLiftIsOpen] = useState(false);
+  const [isOpenUpdate, setIsOpenUpdate] = useState(false);
+
 
   useEffect(() => {
     const token = localStorage.getItem('authToken');
@@ -43,11 +49,44 @@ function GarageDetailPage() {
         })
         .then(data => setLifts(data))
         .catch(error => console.error('Error fetching lifts data:', error));
-  }, [serviceId]);
 
-  if (!service) {
-    return <div>Loading...</div>;
-  }
+    const fetchServices = async () => {
+        try {
+            const response = await fetch(`${serverURL}/services`);
+            const data = await response.json();
+            setServices(data);
+        } catch (error) {
+            console.error('Error fetching services:', error);
+        }
+        };
+    
+        fetchServices();
+  }, []);
+
+  const handleDelete = (liftId) => {
+    const token = localStorage.getItem('authToken');
+    const isConfirmed = window.confirm('Вы уверены что хотите удалить этот пост? Это действие также удалит все связанные с этим постом записи');
+    if (isConfirmed) {
+      fetch(`${serverURL}/lifts/${liftId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      .then(response => {
+        if (response.ok) setServices(lifts.filter(lift => lift.id !== serviceId));
+        else console.error('Failed to delete service');
+        window.location.reload();
+      })
+      .catch(error => console.error('Error deleting service:', error));
+    } 
+    else console.log('Service deletion cancelled');
+  };
+
+  const handleUpdateLift = (liftId) => {
+    setLiftId(liftId);
+    setIsOpenUpdate(true);
+  };
 
 //   return (
 //     <div>
@@ -78,7 +117,7 @@ return (
               </Title>
               <Group align="center" justify="space-between">
                   <Title order={2}>
-                      Доступные подъёмники
+                      Доступные посты
                   </Title>
                   {isAdmin && (
                       <Stack
@@ -86,8 +125,10 @@ return (
                           justify="center"
                           gap="xs"
                       >
-                          <Button color="blue" mt="md" radius="md">
-                              Добавить подъёмник
+                          <Button color="blue" mt="md" radius="md" onClick={() => {
+                        setLiftIsOpen(true)
+                        }}>
+                              Добавить пост
                           </Button>
                           <Space h='md'/>
                       </Stack>
@@ -104,24 +145,38 @@ return (
       {
           !isLoading && !lifts.length &&
           <Text ta="center" mt="md" mb={50}>
-              Нет доступных подъёмников!
+              Нет доступных постов!
           </Text>
 
       }
       <SimpleGrid cols={3}>
-          {lifts && lifts.map(lift => (
-              <Card shadow="sm" padding="lg" radius="md" withBorder key={lift.id}
+        {lifts && lifts.map(lift => (
+            <div key={lift.id}> {/* Container for Card and Button */}
+                <Card shadow="sm" padding="lg" radius="md" withBorder
                     onClick={() => {
                         setLiftId(lift.id)
                         setBookingIsOpen(true)
                     }}>
-                  <Text ta="center">
-                      {lift.name}
-                  </Text>
-              </Card>
-          ))}
-      </SimpleGrid>
-      <BookingModal isOpen={bookingIsOpen} setIsOpen={setBookingIsOpen} liftId={liftId}/>
+                    <Text ta="center">
+                        {lift.name}
+                    </Text>
+                </Card>
+                {isAdmin &&
+                <Group spacing="xs" mt="md">
+                <Button color="red" radius="md" style={{ flex: 1 }} onClick={() => handleDelete(lift.id)}>
+                    Удалить
+                </Button>
+                <Button color="yellow" radius="md" style={{ flex: 1 }} onClick={() => {handleUpdateLift(lift.id)}}>
+                    Изменить
+                </Button>
+            </Group>
+        }
+            </div>
+        ))}
+    </SimpleGrid>
+      <BookingModal isOpen={bookingIsOpen} setIsOpen={setBookingIsOpen} liftId={liftId} services ={services}/>
+      <LiftModal isOpen={liftIsOpen} setIsOpen={setLiftIsOpen} serviceId={serviceId}/>
+      <LiftUpdateModal isOpen={isOpenUpdate} setIsOpen={setIsOpenUpdate} liftId={liftId} serviceId={serviceId} />
   </div>
 );
 }

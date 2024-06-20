@@ -1,21 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import Navbar from './Navbar';
 import { Link, useNavigate  } from 'react-router-dom';
 import { serverURL } from './config.js';
 import { useAuth } from './AuthContext';
 import {Button, Card, Center, Group, Loader, SimpleGrid, Space, Stack, Text, Title} from "@mantine/core";
 import styles from "./GaragesPage.module.css"
+import GarageCreateModal from './components/GarageCreateModal.jsx';
+import GarageUpdateModel from './components/GarageUpdateModal.jsx';
 
 function GaragesPage() {
     const [services, setServices] = useState([]);
     const {isAdmin} = useAuth();
     const navigate = useNavigate(); 
     const [isLoading, setIsLoading] = useState(true)
-
-  const navigateToCreateService = () => {
-    navigate('/carservices/create'); 
-  };
-
+    const [isOpen, setIsOpen] = useState(false);
+    const [isOpenUpdate, setIsOpenUpdate] = useState(false);
+    const [selectedService, setSelectedService] = useState(null);
   
   useEffect(() => {
     const token = localStorage.getItem('authToken');
@@ -53,6 +52,10 @@ function GaragesPage() {
   };
 
 
+  const handleUpdateService = (service) => {
+    setSelectedService(service);
+    setIsOpenUpdate(true);
+  };
 
 //   return (
 //     <div>
@@ -89,7 +92,10 @@ return (
               justify="center"
               gap="xs"
           >
-              <Button color="blue" mt="md" radius="md" onClick={navigateToCreateService}>
+              <Button color="blue" mt="md" radius="md" 
+              onClick={() => {
+                        setIsOpen(true);
+                    }}>
                   Добавить автосервис
               </Button>
               <Space h='md'/>
@@ -119,10 +125,15 @@ return (
                   </Button>
 
                   {isAdmin &&
-                      <Button color="red" mt="md" radius="md" onClick={() => handleDeleteService(service.id)}>
-                          Удалить автосервис
-                      </Button>
-                  }
+                <Group spacing="xs" mt="md">
+                <Button color="red" radius="md" style={{ flex: 1 }} onClick={() => handleDeleteService(service.id)}>
+                    Удалить
+                </Button>
+                <Button color="yellow" radius="md" style={{ flex: 1 }} onClick={() => {handleUpdateService(service)}}>
+                    Изменить
+                </Button>
+            </Group>
+            }
 
               </Card>
 
@@ -137,6 +148,9 @@ return (
               // </li>
           ))}
       </SimpleGrid>
+      <GarageCreateModal isOpen = {isOpen} setIsOpen = {setIsOpen}/>
+      <GarageUpdateModel isOpen = {isOpenUpdate} setIsOpen = {setIsOpenUpdate} name={selectedService?.name} description = {selectedService?.description} garageId={selectedService?.id}/>
+      
   </div>
 );
 }
