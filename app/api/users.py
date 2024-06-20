@@ -18,6 +18,7 @@ from app.models import (
 from app.core.celery_utils import send_email
 from app.core.security import get_password_hash, verify_password, create_confirmation_token, confirm_token
 from fastapi_cache.decorator import cache
+from app.core.config import settings
 
 
 router = APIRouter()
@@ -27,12 +28,22 @@ router = APIRouter()
 def create_user(*, user: UserCreate, session: SessionDep):
     db_user = get_user_by_email(session=session, email=user.email)
     if db_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
+        raise HTTPException(status_code=400, detail="Пользователь с такой почтой уже зарегистрирован")
+
+    email = user.email
+    password = user.password
+
+    if not password or not email:
+        raise HTTPException(
+            status_code=400,
+            detail="Почта или пароль не должны быть пустыми",
+        )
+
     created_user = create_user_crud(session=session, user_create=user)
     confirmation_token = create_confirmation_token(created_user.id)
     email_data = {
-        "subject": "Confirm your email",
-        "body": f"Click the link to confirm your email: http://localhost:8000/users/confirm/{confirmation_token}",
+        "subject": "Подтвердите свою почту",
+        "body": f"Перейдите по ссылке, чтобы подтвердить: http://{settings.FRONTEND_HOST}:{settings.FRONTEND_PORT}/email-confirmation/{confirmation_token}",
         "to": created_user.email,
     }
     send_email.delay(email_data)
@@ -88,36 +99,15 @@ def read_user_me(current_user: CurrentUser):
 
 @router.post("/signup", response_model=UserPublic)
 def register_user(session: SessionDep, user_in: UserRegister):
-    #if not settings.USERS_OPEN_REGISTRATION:
-    if False:
-        raise HTTPException(
-            status_code=403,
-            detail="Open user registration is forbidden on this server",
-        )
     user = get_user_by_email(session=session, email=user_in.email)
     if user:
         raise HTTPException(
             status_code=400,
-            detail="The user with this email already exists in the system",
+            detail="Пользователь с такой почтой уже существует",
         )
     user_create = UserCreate.model_validate(user_in)
     user = create_user(session=session, user=user_create)
     return user
-
-
-# @router.get("/{user_id}", response_model=UserPublic)
-# @cache(expire=120)
-# def read_user_by_id(user_id: int, session: SessionDep, current_user: CurrentUser):
-#     user = session.get(User, user_id)
-#     if user == current_user:
-#         return user
-#     if not current_user.is_superuser:
-#         raise HTTPException(
-#             status_code=403,
-#             detail="The user doesn't have enough privileges",
-#         )
-#     return user
-
 
 @router.patch("/{user_id}", dependencies=[Depends(get_current_active_superuser)], response_model=UserPublic, )
 def update_user(*, session: SessionDep, user_id: int, user_in: UserUpdate, ):
