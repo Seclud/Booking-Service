@@ -9,8 +9,37 @@ import { set } from 'date-fns';
 function BookingsPage() {
   const [bookings, setBookings] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [bookingIsOpen, setBookingIsOpen] = useState(false);
-  const [bookingId, setbookingId] = useState(0);
+  const [services, setServices] = useState([]);
+  const [selectedBookingDetails, setSelectedBookingDetails] = useState(null);
+  const [openBookingId, setOpenBookingId] = useState(null);
+
+  const fetchBookingDetails = async (bookingId, setBookingDetails) => {
+    try {
+      const response = await fetch(`${serverURL}/bookings/${bookingId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        },
+      });
+      if (!response.ok) throw new Error('Failed to fetch booking details');
+      const data = await response.json();
+      if (data.length === 0) throw new Error('No booking details found');
+      setBookingDetails(data[0]);
+    } catch (error) {
+      console.error('Error fetching booking details:', error);
+    }
+  };
+
+  const fetchServices = async () => {
+    try {
+      const response = await fetch(`${serverURL}/services`);
+      const data = await response.json();
+      setServices(data);
+    } catch (error) {
+      console.error('Error fetching services:', error);
+    }
+  };
 
   useEffect(() => {
     const token = localStorage.getItem('authToken');
@@ -30,7 +59,14 @@ function BookingsPage() {
       console.error('Error fetching bookings:', error); 
       setIsLoading(false);
     });
+
+    
+    fetchServices();
   }, []);
+
+  const handleBookingSelect = (bookingId) => {
+    fetchBookingDetails(bookingId, setSelectedBookingDetails);
+  };
 
     const formatDateTime = (dateTimeStr) => {
       const date = new Date(dateTimeStr);
@@ -58,33 +94,13 @@ function BookingsPage() {
         } else {
           console.error('Failed to cancel booking');
         }
+        window.location.reload();
       })
       .catch(error => console.error('Error canceling booking:', error));
     } else{
       console.log('Booking is not canceled');
     }
     };
-
-    const handleUpdateBooking = (bookingId, updatedBookingData) => {
-        const token = localStorage.getItem('authToken');
-        fetch(`${serverURL}/bookings/${bookingId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify(updatedBookingData)
-        })
-        .then(response => {
-          if (response.ok) {
-            // Optionally, fetch all bookings again or update the state locally
-            console.log('Booking updated successfully');
-          } else {
-            console.error('Failed to update booking');
-          }
-        })
-        .catch(error => console.error('Error updating booking:', error));
-      };
 
   //   if (isLoading) { 
   //     return <div>
@@ -167,12 +183,12 @@ function BookingsPage() {
                         Отменить запись
                     </Button>
                     <Button color="yellow" ml="10" onClick={() => {
-                        setBookingIsOpen(true)
-                        setbookingId(booking.booking.id)
+                        handleBookingSelect(booking.booking.id)
+                        setOpenBookingId(booking.booking.id)
                         }}>
                         Изменить запись
                     </Button>
-                    <BookingUpdateModal isOpen={bookingIsOpen} setIsOpen={setBookingIsOpen} bookingId={bookingId}/>
+                    <BookingUpdateModal isOpen={openBookingId === booking.booking.id} setIsOpen={setOpenBookingId} bookingId={booking.booking.id} bookingDetails={selectedBookingDetails} servicesProp={services}/>
                 </Paper>
             ))}
         </Stack>

@@ -10,9 +10,9 @@ import ReactSelect from 'react-select';
 
 export default function BookingModal(props) {
     const navigate = useNavigate();
-    const [services, setServices] = useState([]);
+    const [services, setServices] = useState(props.services);
     const [selectedServiceIds, setSelectedServiceIds] = useState([]);
-    const options = services.map(service => ({
+    const options = props.services.map(service => ({
         value: `${service.id}`,
         label: `${service.description} (${service.duration} минут)`
     }));
@@ -23,15 +23,6 @@ export default function BookingModal(props) {
         time_from: '',
         time_to: '',
     });
-
-    useEffect(() => {
-        const fetchServices = async () => {
-            const response = await fetch(`${serverURL}/services`);
-            const data = await response.json();
-            setServices(data);
-        };
-        fetchServices();
-    }, []);
 
     const calculateAndSetTimeTo = (newSelectedServiceIds) => {
             const totalDuration = newSelectedServiceIds.reduce((acc, serviceId) => {
@@ -44,12 +35,10 @@ export default function BookingModal(props) {
                 const timeTo = addMinutes(timeFrom, totalDuration);
                 const formattedTimeTo = formatISO(timeTo, {representation: 'complete'});
                 const formattedTimeToCorrected = formattedTimeTo.slice(0, 19)
-                console.log(timeFrom, timeTo, formattedTimeToCorrected)
                 setBookingData({...bookingData, time_to: formattedTimeToCorrected});
             }
         }
     ;
-
     const handleChange = (selectedOptions) => {
         const newSelectedServiceIds = selectedOptions.map(option => parseInt(option.value));
         setSelectedServiceIds(newSelectedServiceIds);
@@ -99,7 +88,7 @@ export default function BookingModal(props) {
                 throw new Error(errorMessage);
             }
             setErrorMessage('');
-            console.log('Booking created successfully:', await response.data);
+            //console.log('Booking created successfully:', await response.data);
             
             notifications.show({
                 title: 'Вы успешно записались',
@@ -134,7 +123,7 @@ export default function BookingModal(props) {
                 justify="flex-start"
                 gap="md"
             >
-                <Title order={2} ta="center" mt="md">Забронировать подъёмник</Title>
+                <Title order={2} ta="center" mt="md">Записаться на</Title>
                 {/* <MultiSelect
                     label="Услуги"
                     placeholder="Выберите услуги"

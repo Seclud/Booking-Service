@@ -3,10 +3,43 @@ import Navbar from './Navbar';
 import {Button, Center, Group, Loader, Paper, Stack, Text, Title} from '@mantine/core';
 import { serverURL } from './config.js';
 import styles from './BookingsPage.module.css'
+import BookingUpdateModal from "./components/BookingUpdateModal.jsx";
 
 function BookingsPage() {
   const [bookings, setBookings] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [services, setServices] = useState([]);
+  const [selectedBookingDetails, setSelectedBookingDetails] = useState(null);
+  const [openBookingId, setOpenBookingId] = useState(null);
+  
+
+  const fetchBookingDetails = async (bookingId, setBookingDetails) => {
+    try {
+      const response = await fetch(`${serverURL}/bookings/${bookingId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        },
+      });
+      if (!response.ok) throw new Error('Failed to fetch booking details');
+      const data = await response.json();
+      if (data.length === 0) throw new Error('No booking details found');
+      setBookingDetails(data[0]);
+    } catch (error) {
+      console.error('Error fetching booking details:', error);
+    }
+  };
+
+  const fetchServices = async () => {
+    try {
+      const response = await fetch(`${serverURL}/services`);
+      const data = await response.json();
+      setServices(data);
+    } catch (error) {
+      console.error('Error fetching services:', error);
+    }
+  };
 
   useEffect(() => {
     const token = localStorage.getItem('authToken');
@@ -26,6 +59,9 @@ function BookingsPage() {
       console.error('Error fetching bookings:', error); 
       setIsLoading(false);
     });
+  
+    fetchServices();
+
   }, []);
 
     const formatDateTime = (dateTimeStr) => {
@@ -38,27 +74,47 @@ function BookingsPage() {
       return `${day} ${month} ${year} ${hour}:${minute}`;
     };
 
-    const handleCancelBooking = (bookingId) => {
+    const handleCancelBooking = (booking) => {
       const token = localStorage.getItem('authToken');
       const isConfirmed = window.confirm('Are you sure you want to cancel this booking?');
+      const serviceIds = booking.services.map(service => service.id);
       if (isConfirmed) {
-      fetch(`${serverURL}/bookings/${bookingId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
-      .then(response => {
-        if (response.ok) {
-          setBookings(bookings.filter(booking => booking.id !== bookingId));
-        } else {
-          console.error('Failed to cancel booking');
-        }
-      })
-      .catch(error => console.error('Error canceling booking:', error));
-    } else{
-      console.log('Booking is not canceled');
-    }
+        fetch(`${serverURL}/bookings/${booking.booking.id}`, {
+          method: 'PUT', 
+          headers: {
+            'Content-Type': 'application/json', 
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            booking: {
+              status: 'cancelled',
+              time_from: booking.booking.time_from,
+              time_to: booking.booking.time_to
+            },
+            service_ids: serviceIds
+          }) 
+        })
+        .then(response => {
+          if (response.ok) {
+            setBookings(bookings.map(booking => {
+              if (booking.id === booking.booking.id) {
+                return { ...booking, status: 'cancelled' }; 
+              }
+              return booking;
+            }));
+          } else {
+            console.error('Failed to update booking status');
+          }
+          window.location.reload();
+        })
+        .catch(error => console.error('Error updating booking status:', error));
+      } else {
+        console.log('Booking status update cancelled');
+      }
+    };
+
+    const handleBookingSelect = (bookingId) => {
+      fetchBookingDetails(bookingId, setSelectedBookingDetails);
     };
 
   //   if (isLoading) { 
@@ -125,6 +181,10 @@ function BookingsPage() {
                             <Text fw={600}>Конец обслуживания: </Text>
                             <Text>{formatDateTime(booking.booking.time_to)}</Text>
                         </Group>
+                        <Group>
+                            <Text fw={600}>Статус брони: </Text>
+                            <Text>{booking.booking.status}</Text>
+                        </Group>
                     </Stack>
 
                     <Text fw={600}>Услуги: </Text>
@@ -133,9 +193,18 @@ function BookingsPage() {
                             <li key={service.id}>{service.description} (Продолжительность: {service.duration} минут)</li>
                         ))}
                     </ul>
-                    <Button color="red" onClick={() => handleCancelBooking(booking.booking.id)}>
+                    {booking.booking.status !== 'cancelled' && (
+                      <Button color="red" onClick={() => handleCancelBooking(booking)}>
                         Отменить запись
+                      </Button>
+                    )}
+                    <Button color="yellow" ml="10" onClick={() => {
+                        handleBookingSelect(booking.booking.id)
+                        setOpenBookingId(booking.booking.id)
+                        }}>
+                        Изменить запись
                     </Button>
+                    <BookingUpdateModal isOpen={openBookingId === booking.booking.id} setIsOpen={setOpenBookingId} bookingId={booking.booking.id} bookingDetails={selectedBookingDetails} servicesProp={services}/>
                 </Paper>
             ))}
         </Stack>
