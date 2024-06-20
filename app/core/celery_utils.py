@@ -14,15 +14,17 @@ app = Celery('tasks', broker=f'pyamqp://{settings.RABBIT_USER}:{settings.RABBIT_
 
 @app.task
 def send_email(email_data):
+    from_name = "Booking Service" 
+    from_email = "tihegr@rambler.com"
     msg = MIMEText(email_data["body"])
     msg["Subject"] = email_data["subject"]
-    msg["From"] = "BookingService"
+    msg["From"] = f"{from_name} <{from_email}>"
     msg["To"] = email_data["to"]
 
     try:
         s = smtplib.SMTP_SSL(settings.SMTP_HOST, settings.SMTP_PORT)
         s.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
-        s.sendmail(msg["From"], msg["To"], msg.as_string())
+        s.sendmail(from_email, msg["To"], msg.as_string())
         s.quit()
         return "Email sent successfully"
     except Exception as e:
