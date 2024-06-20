@@ -24,6 +24,10 @@ export default function BookingModal(props) {
         time_to: '',
     });
 
+    useEffect(() => {
+        setServices(props.services);
+    }, [props.services]);
+
     const calculateAndSetTimeTo = (newSelectedServiceIds) => {
             const totalDuration = newSelectedServiceIds.reduce((acc, serviceId) => {
                 const service = services.find(service => service.id === serviceId);
