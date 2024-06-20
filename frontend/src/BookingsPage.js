@@ -75,7 +75,7 @@ function BookingsPage() {
 
     const handleCancelBooking = (booking) => {
         const token = localStorage.getItem('authToken');
-        const isConfirmed = window.confirm('Are you sure you want to cancel this booking?');
+        const isConfirmed = window.confirm('Вы точно хотите отменить запись?');
         const serviceIds = booking.services.map(service => service.id);
         if (isConfirmed) {
             fetch(`${serverURL}/bookings/${booking.booking.id}`, {
