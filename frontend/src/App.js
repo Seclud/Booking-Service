@@ -1,16 +1,13 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { AuthProvider } from './AuthContext';
+import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
+import {AuthProvider} from './AuthContext';
 import './App.css'
 import LoginPage from './LoginPage.js';
 import RegistrationPage from './RegistrationPage';
 import HomePage from './HomePage';
 import GaragesPage from './GaragesPage';
 import GarageDetailPage from './GarageDetailPage';
-import LiftBookingPage from './LiftBookingPage';
 import BookingsPage from './BookingsPage.js';
-import CreateGaragePage from './CreateGaragePage.js';
-import LiftCreationPage from './LiftCreationPage';
 import AllBookingsPage from './AllBookingsPage.js'
 import {MantineProvider} from "@mantine/core";
 import '@mantine/core/styles.css';
@@ -23,35 +20,32 @@ import AuthGuard from './authGuard';
 import NotAuthGuard from './notAuthGuard';
 
 function App() {
-  return (
-    <MantineProvider>
-      <Notifications />
-      <AuthProvider>
-        <Router>
-            <Routes>
-              <Route element={<Layout />}>
-                <Route element={<NotAuthGuard />}>
-                  <Route path="/" element={<HomePage />} />
-                  <Route path="/login" element={<LoginPage />} />
-                  <Route path="/registration" element={<RegistrationPage />} />           
-                </Route>
-                <Route path="/email-confirmation/:confirmationToken" element={<EmailConfirmationPage />} />
-                <Route path="/garages" element={<GaragesPage />} />
-                <Route element={<AuthGuard />}>
-                    <Route path="/garages" element={<GaragesPage />} />
-                    <Route path="/garage/:id" element={<GarageDetailPage/>} />
-                    <Route path="/book/lift/:liftId" element={<LiftBookingPage />} />
-                    <Route path="/bookings" element={<BookingsPage />} />
-                    <Route path="/garage/create" element={<CreateGaragePage />} />
-                    <Route path="/lifts/create/:serviceId" element={<LiftCreationPage />} />
-                    <Route path="/all-bookings" element={<AllBookingsPage />} />               
-                </Route>            
-              </Route>
-            </Routes>
-        </Router>
-      </AuthProvider>
-    </MantineProvider>
-  );
+    return (
+        <MantineProvider>
+            <Notifications/>
+            <AuthProvider>
+                <Router>
+                    <Routes>
+                        <Route element={<Layout/>}>
+                            <Route element={<NotAuthGuard/>}>
+                                <Route path="/" element={<HomePage/>}/>
+                                <Route path="/login" element={<LoginPage/>}/>
+                                <Route path="/registration" element={<RegistrationPage/>}/>
+                            </Route>
+                            <Route path="/email-confirmation/:confirmationToken" element={<EmailConfirmationPage/>}/>
+                            <Route path="/garages" element={<GaragesPage/>}/>
+                            <Route element={<AuthGuard/>}>
+                                <Route path="/garages" element={<GaragesPage/>}/>
+                                <Route path="/garage/:id" element={<GarageDetailPage/>}/>
+                                <Route path="/bookings" element={<BookingsPage/>}/>
+                                <Route path="/all-bookings" element={<AllBookingsPage/>}/>
+                            </Route>
+                        </Route>
+                    </Routes>
+                </Router>
+            </AuthProvider>
+        </MantineProvider>
+    );
 }
 
 export default App;
