@@ -1,13 +1,14 @@
-from celery import Celery
 import smtplib
-from email.mime.text import MIMEText
-from sqlmodel import select, Session, func
-from app.api.deps import SessionDep
 from datetime import timedelta, date
+from email.mime.text import MIMEText
+
+from celery import Celery
 from celery.schedules import crontab
+from sqlmodel import select, Session, func
+
 from app.models import Booking, CarService, Lift
-from .database import engine
 from .config import settings
+from .database import engine
 
 app = Celery('tasks', broker=f'pyamqp://{settings.RABBIT_USER}:{settings.RABBIT_PASSWORD}@{settings.RABBIT_HOST}:{settings.RABBIT_PORT}//')
 
