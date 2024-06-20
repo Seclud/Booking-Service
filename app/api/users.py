@@ -1,8 +1,12 @@
 from fastapi import APIRouter, HTTPException, Depends
-from app import models
-from app.api.deps import SessionDep, get_current_active_superuser, CurrentUser
-from app.crud.user import (get_user_by_email, create_user as create_user_crud)
+from fastapi_cache.decorator import cache
 from sqlmodel import select, col, delete, func
+
+from app.api.deps import SessionDep, get_current_active_superuser, CurrentUser
+from app.core.celery_utils import send_email
+from app.core.config import settings
+from app.core.security import get_password_hash, verify_password, create_confirmation_token, confirm_token
+from app.crud.user import (get_user_by_email, create_user as create_user_crud)
 from app.models import (
     CarService,
     Message,
@@ -15,11 +19,6 @@ from app.models import (
     UserUpdate,
     UserUpdateMe,
 )
-from app.core.celery_utils import send_email
-from app.core.security import get_password_hash, verify_password, create_confirmation_token, confirm_token
-from fastapi_cache.decorator import cache
-from app.core.config import settings
-
 
 router = APIRouter()
 
