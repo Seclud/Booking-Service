@@ -46,7 +46,10 @@ export default function Layout() {
                     {
                         isAuthenticated &&
                         <Group>
-                            <Button variant="subtle" color="gray" size="md" onClick={() => logout()}>Выйти</Button>
+                            <Button variant="subtle" color="gray" size="md" onClick={() => {
+                                logout()
+                                window.location.reload()
+                            }}>Выйти</Button>
                         </Group>
                     }
                 </div>
