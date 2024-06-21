@@ -36,7 +36,7 @@ export default function BookingModal(props) {
             }, 0);
 
             if (bookingData.time_from) {
-                const timeFrom = new Date(bookingData.time_from);
+                const timeFrom = new Date(bookingData.time_from) - timezoneOffset;
                 const timeTo = addMinutes(timeFrom, totalDuration);
                 console.log(timeFrom,timeTo)
                 const formattedTimeTo = formatISO(timeTo, {representation: 'complete'});
@@ -82,8 +82,8 @@ export default function BookingModal(props) {
                 body: JSON.stringify({
                     booking: {
                         status: "await_confirm",
-                        time_from: bookingData.time_from - timezoneOffset,
-                        time_to: bookingData.time_to - timezoneOffset,
+                        time_from: bookingData.time_from ,
+                        time_to: bookingData.time_to,
                         lift_id: parseInt(bookingData.lift_id),
                     },
                     service_ids: selectedServiceIds.map(service => parseInt(service)),
