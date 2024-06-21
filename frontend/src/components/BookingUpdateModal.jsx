@@ -77,6 +77,11 @@ const BookingUpdateModal = ({isOpen, setIsOpen, bookingId, bookingDetails, servi
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            const toUTCString = (date) => {
+                const pad = (num) => num.toString().padStart(2, '0');
+                return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}.000Z`;
+            };
+
             const response = await fetch(`${serverURL}/bookings/${bookingId}`, {
                 method: 'PUT',
                 headers: {
@@ -85,8 +90,8 @@ const BookingUpdateModal = ({isOpen, setIsOpen, bookingId, bookingDetails, servi
                 },
                 body: JSON.stringify({
                     booking: {
-                        time_from: timeFrom.toISOString(),
-                        time_to: timeTo.toISOString(),
+                        time_from: toUTCString(timeFrom),
+                        time_to: toUTCString(timeTo),
                         status: status,
                     },
                     service_ids: selectedServiceIds
@@ -98,6 +103,8 @@ const BookingUpdateModal = ({isOpen, setIsOpen, bookingId, bookingDetails, servi
             }
             setIsOpen(false);
             setErrorMessage('');
+            console.log(timeFrom,timeTo);
+            console.log(timeFrom.toISOString(),timeTo.toISOString())
             window.location.reload();
         } catch (error) {
             console.error('Error updating booking:', error.message);
@@ -115,8 +122,6 @@ const BookingUpdateModal = ({isOpen, setIsOpen, bookingId, bookingDetails, servi
 
         const newtimeTo = addMinutes(timeFrom, totalDuration);
         setTimeTo(newtimeTo)
-        console.log(timeFrom);
-        console.log(timeTo)
         setSelectedServices(updatedSelectedServices);
     };
 
