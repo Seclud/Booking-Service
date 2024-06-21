@@ -51,7 +51,7 @@ export default function BookingModal(props) {
     };
 
     const handleTimeChange = (name, value) => {
-        setBookingData({...bookingData, [name]: value - timezoneOffset});
+        setBookingData({...bookingData, [name]: value});
     };
 
     useEffect(() => {

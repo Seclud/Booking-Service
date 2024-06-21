@@ -32,7 +32,7 @@ function BookingsPage() {
 
     const fetchServices = async () => {
         try {
-            const response = await fetch(`${serverURL}/services`);
+            const response = await fetch(`${serverURL}/services/services`);
             const data = await response.json();
             setServices(data);
         } catch (error) {
