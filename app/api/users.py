@@ -18,6 +18,9 @@ from app.models import (
     UsersPublic,
     UserUpdate,
     UserUpdateMe,
+    Booking,
+    Lift,
+    BookingServices,
 )
 
 router = APIRouter()
@@ -50,7 +53,7 @@ def create_user(*, user: UserCreate, session: SessionDep):
 
 
 @router.get("/", response_model=UsersPublic, dependencies=[Depends(get_current_active_superuser)])
-@cache(expire=120)
+@cache(expire=60)
 def read_users(session: SessionDep, skip: int = 0, limit: int = 100):
     count_statement = select(func.count()).select_from(User)
     count = session.exec(count_statement).one()
@@ -91,7 +94,7 @@ def update_password_me(*, session: SessionDep, body: UpdatePassword, current_use
 
 
 @router.get("/me", response_model=UserPublic)
-@cache(expire=120)
+@cache(expire=60)
 def read_user_me(current_user: CurrentUser):
     return current_user
 
@@ -138,8 +141,27 @@ def delete_user(
         raise HTTPException(
             status_code=403, detail="Super users are not allowed to delete themselves"
         )
-    statement = delete(CarService).where(col(CarService.owner_id) == user_id)
-    session.exec(statement)
+        
+    booking_services_statement = delete(BookingServices).where(
+        BookingServices.booking_id.in_(
+            select(Booking.id).where(Booking.owner_id == user_id)
+        )
+    )
+    session.exec(booking_services_statement)
+    
+    booking_statement = delete(Booking).where(Booking.owner_id == user_id)
+    session.exec(booking_statement)
+    
+    lifts_statement = delete(Lift).where(
+        Lift.carservice_id.in_(
+            select(CarService.id).where(CarService.owner_id == user_id)
+        )
+    )
+    session.exec(lifts_statement)
+    
+    car_service_statement = delete(CarService).where(CarService.owner_id == user_id)
+    session.exec(car_service_statement)
+    
     session.delete(user)
     session.commit()
     return Message(message="User deleted successfully")
