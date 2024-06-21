@@ -148,6 +148,7 @@ const BookingUpdateModal = ({isOpen, setIsOpen, bookingId, bookingDetails, servi
                     label="До"
                     value={timeTo}
                     onChange={setTimeTo}
+                    disabled={!isAdmin}
                 />
                 {isAdmin && (
                     <Select
