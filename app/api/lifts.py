@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlmodel import select
 
 from app.api.deps import CurrentUser, SessionDep, get_current_active_superuser
-from app.models import Lift, LiftCreate, LiftUpdate, Message, Booking
+from app.models import Lift, LiftCreate, LiftUpdate, Message, Booking, BookingServices
 
 router = APIRouter()
 
@@ -42,6 +42,10 @@ def delete_lift(session: SessionDep, id: int, current_user: CurrentUser):
 
     bookings = session.exec(select(Booking).where(Booking.lift_id == id)).all()
     for booking in bookings:
+        booking_services = session.exec(select(BookingServices).where(BookingServices.booking_id == booking.id)).all()
+        for booking_service in booking_services:
+            session.delete(booking_service)
+
         session.delete(booking)
 
     session.delete(lift)
