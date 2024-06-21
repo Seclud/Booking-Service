@@ -81,6 +81,8 @@ const BookingUpdateModal = ({isOpen, setIsOpen, bookingId, bookingDetails, servi
                 const date = new Date(localTime);
             
                 date.setTime(date.getTime() + (hoursToAdd * 60 * 60 * 1000));
+
+                console.log(date)
             
                 return date.toISOString();
             }
