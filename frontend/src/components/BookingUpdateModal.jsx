@@ -114,7 +114,9 @@ const BookingUpdateModal = ({isOpen, setIsOpen, bookingId, bookingDetails, servi
         const totalDuration = updatedSelectedServices.reduce((acc, service) => acc + service.duration, 0);
 
         const newtimeTo = addMinutes(timeFrom, totalDuration);
-        setTimeTo(newtimeTo);
+        setTimeTo(newtimeTo)
+        console.log(timeFrom);
+        console.log(timeTo)
         setSelectedServices(updatedSelectedServices);
     };
 
