@@ -69,12 +69,15 @@ function BookingsPage() {
 
     const formatDateTime = (dateTimeStr) => {
         const date = new Date(dateTimeStr);
-        const year = date.getFullYear();
-        const month = date.toLocaleString('default', {month: 'long'});
-        const day = date.getDate();
-        const hour = date.getHours().toString().padStart(2, '0');
-        const minute = date.getMinutes().toString().padStart(2, '0');
-        return `${day} ${month} ${year} ${hour}:${minute}`;
+        const options = {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            timeZone: 'Asia/Yekaterinburg'
+        };
+        return date.toLocaleString('ru-RU', options);
     };
 
     const handleCancelBooking = (bookingId) => {
@@ -100,6 +103,7 @@ function BookingsPage() {
             console.log('Booking is not deleted');
         }
     };
+    
 
     //   if (isLoading) {
     //     return <div>
