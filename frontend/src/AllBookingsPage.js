@@ -70,7 +70,7 @@ function BookingsPage() {
 
     const formatDateTime = (dateTimeStr) => {
         const dateTimeStrasDate = new Date(dateTimeStr)
-        const date = new Date(dateTimeStrasDate.getTime() + timezoneOffset);
+        const date = new Date(dateTimeStrasDate.getTime());
         const year = date.getFullYear();
         const month = date.toLocaleString('default', {month: 'long'});
         const day = date.getDate();

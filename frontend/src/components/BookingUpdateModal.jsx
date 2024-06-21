@@ -14,6 +14,7 @@ const BookingUpdateModal = ({isOpen, setIsOpen, bookingId, bookingDetails, servi
     const [timeFrom, setTimeFrom] = useState(new Date());
     const [timeTo, setTimeTo] = useState(new Date());
     const [status, setStatus] = useState('');
+    const timezoneOffset = new Date().getTimezoneOffset() * 60000;
 
     const [errorMessage, setErrorMessage] = useState('');
     const [services, setServices] = useState(servicesProp)
@@ -95,8 +96,8 @@ const BookingUpdateModal = ({isOpen, setIsOpen, bookingId, bookingDetails, servi
                 },
                 body: JSON.stringify({
                     booking: {
-                        time_from: timeFrom,
-                        time_to: timeTo.toISOString(),
+                        time_from: timeFrom - timezoneOffset,
+                        time_to: timeTo - timezoneOffset,
                         status: status,
                     },
                     service_ids: selectedServiceIds
@@ -110,7 +111,7 @@ const BookingUpdateModal = ({isOpen, setIsOpen, bookingId, bookingDetails, servi
             setErrorMessage('');
             console.log(timeFrom,timeTo);
             console.log(timeFrom.toISOString(),timeTo.toISOString())
-            window.location.reload();
+            //window.location.reload();
         } catch (error) {
             console.error('Error updating booking:', error.message);
             setErrorMessage(error.message);
