@@ -36,7 +36,7 @@ export default function BookingModal(props) {
             }, 0);
 
             if (bookingData.time_from) {
-                const timeFrom = new Date(bookingData.time_from) - timezoneOffset;
+                const timeFrom = new Date(bookingData.time_from);
                 const timeTo = addMinutes(timeFrom, totalDuration);
                 console.log(timeFrom,timeTo)
                 const formattedTimeTo = formatISO(timeTo, {representation: 'complete'});
@@ -53,7 +53,7 @@ export default function BookingModal(props) {
     };
 
     const handleTimeChange = (name, value) => {
-        setBookingData({...bookingData, [name]: value});
+        setBookingData({...bookingData, [name]: value - timezoneOffset});
     };
 
     useEffect(() => {
