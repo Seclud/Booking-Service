@@ -7,8 +7,9 @@ from sqlmodel import select, and_, delete
 
 from app.api.deps import CurrentUser, SessionDep, get_current_active_superuser
 from app.core.celery_utils import send_booking_reminder
+from app.crud.booking import get_bookings
 from app.crud.lift import get_lift
-from app.models import Booking, BookingCreate, BookingUpdate, Message, Services, BookingServices
+from app.models import Booking, BookingCreate, BookingUpdate, Message, Services, BookingServices, Lift, CarService
 from app.utils.booking_utils import convert_to_timezone, check_existing_bookings, target_timezone
 
 router = APIRouter()
@@ -16,25 +17,7 @@ router = APIRouter()
 
 @router.get("/admin/all", dependencies=[Depends(get_current_active_superuser)])
 def read_all_bookings(session: SessionDep, current_user: CurrentUser):
-    statement = (
-        select(Booking, Services)
-        .join(BookingServices, BookingServices.booking_id == Booking.id)
-        .join(Services, Services.id == BookingServices.service_id)
-    )
-    results = session.exec(statement).all()
-
-    bookings_with_services = {}
-    for booking, service in results:
-        if booking.id not in bookings_with_services:
-            bookings_with_services[booking.id] = {
-                "booking": booking,
-                "services": []
-            }
-        bookings_with_services[booking.id]["services"].append(service)
-
-    bookings_list = list(bookings_with_services.values())
-
-    return bookings_list
+    return get_bookings(session, current_user)
 
 
 @router.get("/admin/{user_id}", dependencies=[Depends(get_current_active_superuser)])
@@ -46,26 +29,7 @@ def read_bookings(session: SessionDep, user_id: int, current_user: CurrentUser):
 
 @router.get("/my/all")
 def read_my_bookings(session: SessionDep, current_user: CurrentUser):
-    statement = (
-        select(Booking, Services)
-        .join(BookingServices, BookingServices.booking_id == Booking.id)
-        .join(Services, Services.id == BookingServices.service_id)
-        .where(Booking.owner_id == current_user.id)
-    )
-    results = session.exec(statement).all()
-
-    bookings_with_services = {}
-    for booking, service in results:
-        if booking.id not in bookings_with_services:
-            bookings_with_services[booking.id] = {
-                "booking": booking,
-                "services": []
-            }
-        bookings_with_services[booking.id]["services"].append(service)
-
-    bookings_list = list(bookings_with_services.values())
-
-    return bookings_list
+    return get_bookings(session, current_user, user_id=current_user.id)
 
 
 @router.post("/")
