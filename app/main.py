@@ -8,7 +8,7 @@ from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from sqlmodel import select
 
-from app.api import users, login, carservice, lifts, bookings
+from app.api import users, login, carservice, lifts, bookings, services
 from app.api.deps import SessionDep
 from app.models import Services
 from .core.config import settings
@@ -34,7 +34,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH"],
     allow_headers=["*"],
 )
 
@@ -43,10 +43,5 @@ app.include_router(login.router, tags=["login"])
 app.include_router(carservice.router, prefix="/carservices", tags=["carservices"])
 app.include_router(lifts.router, prefix="/lifts", tags=["lifts"])
 app.include_router(bookings.router, prefix="/bookings", tags=["bookings"])
+app.include_router(services.router, prefix="/services", tags=["services"])
 
-
-@app.get("/services")
-def get_services(session: SessionDep):
-    statement = select(Services)
-    services = session.exec(statement).all()
-    return services
