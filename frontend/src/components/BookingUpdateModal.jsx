@@ -24,6 +24,10 @@ const BookingUpdateModal = ({isOpen, setIsOpen, bookingId, bookingDetails, servi
     }));
 
     useEffect(() => {
+        setServices(servicesProp);
+    }, [servicesProp]);
+
+    useEffect(() => {
         if (bookingDetails) {
 
             setTimeFrom(new Date(bookingDetails.booking.time_from));
@@ -121,15 +125,6 @@ const BookingUpdateModal = ({isOpen, setIsOpen, bookingId, bookingDetails, servi
 
         const newTimeTo = addMinutes(time, totalDuration);
         setTimeTo(newTimeTo);
-    };
-
-    const handleClose = () => {
-        setSelectedServices([]);
-        setSelectedServiceIds([]);
-        setTimeFrom(new Date());
-        setTimeTo(new Date());
-        setStatus('');
-        setErrorMessage('');
     };
 
     return (
