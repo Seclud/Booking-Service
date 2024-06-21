@@ -17,6 +17,7 @@ export default function BookingModal(props) {
         label: `${service.description} (${service.duration} минут)`
     }));
     const [errorMessage, setErrorMessage] = useState('');
+    const timezoneOffset = new Date().getTimezoneOffset() * 60000;
 
     const [bookingData, setBookingData] = useState({
         lift_id: props.liftId,
@@ -81,8 +82,8 @@ export default function BookingModal(props) {
                 body: JSON.stringify({
                     booking: {
                         status: "await_confirm",
-                        time_from: bookingData.time_from,
-                        time_to: bookingData.time_to,
+                        time_from: bookingData.time_from - timezoneOffset,
+                        time_to: bookingData.time_to - timezoneOffset,
                         lift_id: parseInt(bookingData.lift_id),
                     },
                     service_ids: selectedServiceIds.map(service => parseInt(service)),

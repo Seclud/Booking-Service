@@ -78,15 +78,6 @@ const BookingUpdateModal = ({isOpen, setIsOpen, bookingId, bookingDetails, servi
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            function toISOStringAndAddHours(localTime, hoursToAdd) {
-                const date = new Date(localTime);
-            
-                date.setTime(date.getTime() + (hoursToAdd * 60 * 60 * 1000));
-
-                console.log(date)
-            
-                return date.toISOString();
-            }
 
             const response = await fetch(`${serverURL}/bookings/${bookingId}`, {
                 method: 'PUT',
