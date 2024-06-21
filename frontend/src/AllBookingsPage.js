@@ -69,7 +69,8 @@ function BookingsPage() {
     };
 
     const formatDateTime = (dateTimeStr) => {
-        const date = new Date(dateTimeStr.getTime() + timezoneOffset).toISOString();
+        const dateTimeStrasDate = new Date(dateTimeStr)
+        const date = new Date(dateTimeStrasDate.getTime() + timezoneOffset).toISOString();
         const year = date.getFullYear();
         const month = date.toLocaleString('default', {month: 'long'});
         const day = date.getDate();
