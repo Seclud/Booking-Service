@@ -96,7 +96,7 @@ def update_booking(session: SessionDep, id: int, booking: BookingUpdate, current
         raise HTTPException(status_code=400, detail="Время конца должно быть больше времени начала")
 
     update_data = booking.model_dump(exclude_unset=True)
-    db_booking.sqlmodel_update(update_data)
+    db_booking.sqlmodel_update(update_data, update={"time_from": time_from_aware, "time_to": time_to_aware})
     session.add(db_booking)
 
     statement = select(Booking).where(

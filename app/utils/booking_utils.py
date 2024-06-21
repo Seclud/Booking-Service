@@ -3,7 +3,7 @@ from zoneinfo import ZoneInfo
 
 from fastapi import HTTPException
 
-target_timezone = 'Europe/Moscow'
+target_timezone = 'Asia/Yekaterinburg'
 
 
 def convert_to_timezone(time, target_timezone):
