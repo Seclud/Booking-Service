@@ -3,7 +3,7 @@ from sqlmodel import func, select
 
 from app.api.deps import CurrentUser, SessionDep, get_current_active_superuser
 from app.models import CarService, CarServiceCreate, CarServicePublic, CarServicesPublic, CarServiceUpdate, Message, \
-    Lift, Booking
+    Lift, Booking, BookingServices
 
 router = APIRouter()
 
@@ -69,7 +69,13 @@ def delete_service(session: SessionDep, current_user: CurrentUser, id: int) -> M
 
     lifts = session.query(Lift).filter(Lift.carservice_id == id).all()
     for lift in lifts:
+
+        bookings = session.query(Booking).filter(Booking.lift_id == lift.id).all()
+        for booking in bookings:
+            session.query(BookingServices).filter(BookingServices.booking_id == booking.id).delete()
+
         session.query(Booking).filter(Booking.lift_id == lift.id).delete()
+
         session.delete(lift)
 
     session.delete(service)
