@@ -1,9 +1,8 @@
-import React, {useState, useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Button, Center, Group, Loader, Paper, Stack, Text, Title} from '@mantine/core';
 import {serverURL} from './config.js';
 import styles from './BookingsPage.module.css'
 import BookingUpdateModal from "./components/BookingUpdateModal.jsx";
-import {set} from 'date-fns';
 
 function BookingsPage() {
     const [bookings, setBookings] = useState([]);
@@ -52,6 +51,7 @@ function BookingsPage() {
             .then(response => response.json())
             .then(data => {
                 setBookings(data);
+                console.log(data)
                 setIsLoading(false);
             })
             .catch(error => {
@@ -79,7 +79,7 @@ function BookingsPage() {
 
     const handleCancelBooking = (bookingId) => {
         const token = localStorage.getItem('authToken');
-        const isConfirmed = window.confirm('Are you sure you want to cancel this booking?');
+        const isConfirmed = window.confirm('Вы точно хотите удалить эту запись?');
         if (isConfirmed) {
             fetch(`${serverURL}/bookings/${bookingId}`, {
                 method: 'DELETE',
@@ -91,13 +91,13 @@ function BookingsPage() {
                     if (response.ok) {
                         setBookings(bookings.filter(booking => booking.id !== bookingId));
                     } else {
-                        console.error('Failed to cancel booking');
+                        console.error('Failed to delete booking');
                     }
                     window.location.reload();
                 })
-                .catch(error => console.error('Error canceling booking:', error));
+                .catch(error => console.error('Error deleting booking:', error));
         } else {
-            console.log('Booking is not canceled');
+            console.log('Booking is not deleted');
         }
     };
 
@@ -169,6 +169,14 @@ function BookingsPage() {
                             <Group>
                                 <Text fw={600}>Статус брони: </Text>
                                 <Text>{booking.booking.status}</Text>
+                            </Group>
+                            <Group>
+                                <Text fw={600}>Название сервиса: </Text>
+                                <Text>{booking.carServiceName}</Text>
+                            </Group>
+                            <Group>
+                                <Text fw={600}>Название поста: </Text>
+                                <Text>{booking.liftName}</Text>
                             </Group>
                         </Stack>
 

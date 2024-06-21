@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Button, Center, Group, Loader, Paper, Stack, Text, Title} from '@mantine/core';
 import {serverURL} from './config.js';
 import styles from './BookingsPage.module.css'
@@ -52,6 +52,7 @@ function BookingsPage() {
             .then(response => response.json())
             .then(data => {
                 setBookings(data);
+                console.log(data)
                 setIsLoading(false);
             })
             .catch(error => {
@@ -88,7 +89,9 @@ function BookingsPage() {
                     booking: {
                         status: 'cancelled',
                         time_from: booking.booking.time_from,
-                        time_to: booking.booking.time_to
+                        time_to: booking.booking.time_to,
+                        carServiceName: booking.carServiceName,
+                        liftName: booking.liftName,
                     },
                     service_ids: serviceIds
                 })
@@ -183,6 +186,14 @@ function BookingsPage() {
                             <Group>
                                 <Text fw={600}>Статус брони: </Text>
                                 <Text>{booking.booking.status}</Text>
+                            </Group>
+                            <Group>
+                                <Text fw={600}>Название сервиса: </Text>
+                                <Text>{booking.carServiceName}</Text>
+                            </Group>
+                            <Group>
+                                <Text fw={600}>Название поста: </Text>
+                                <Text>{booking.liftName}</Text>
                             </Group>
                         </Stack>
 
