@@ -77,12 +77,12 @@ const BookingUpdateModal = ({isOpen, setIsOpen, bookingId, bookingDetails, servi
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            function toUTCStringAndAddHours(localTime, hoursToAdd) {
+            function toISOStringAndAddHours(localTime, hoursToAdd) {
                 const date = new Date(localTime);
             
-                date.setUTCHours(date.getUTCHours() + hoursToAdd);
+                date.setTime(date.getTime() + (hoursToAdd * 60 * 60 * 1000));
             
-                return date.toUTCString();
+                return date.toISOString();
             }
 
             const response = await fetch(`${serverURL}/bookings/${bookingId}`, {
@@ -93,8 +93,8 @@ const BookingUpdateModal = ({isOpen, setIsOpen, bookingId, bookingDetails, servi
                 },
                 body: JSON.stringify({
                     booking: {
-                        time_from: toUTCStringAndAddHours(timeFrom, 5),
-                        time_to: toUTCStringAndAddHours(timeTo, 5),
+                        time_from: toISOStringAndAddHours(timeFrom, 5),
+                        time_to: toISOStringAndAddHours(timeTo, 5),
                         status: status,
                     },
                     service_ids: selectedServiceIds
