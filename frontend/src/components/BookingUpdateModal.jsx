@@ -100,7 +100,7 @@ const BookingUpdateModal = ({isOpen, setIsOpen, bookingId, bookingDetails, servi
             }
             setIsOpen(false);
             setErrorMessage('');
-            //window.location.reload();
+            window.location.reload();
         } catch (error) {
             console.error('Error updating booking:', error.message);
             setErrorMessage(error.message);
