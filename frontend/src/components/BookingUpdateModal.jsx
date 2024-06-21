@@ -3,7 +3,6 @@ import {Modal, Button, Text, Select, TextInput, MultiSelect} from '@mantine/core
 import {DateTimePicker, TimeInput} from '@mantine/dates';
 import {serverURL} from '../config.js';
 import {addMinutes, formatISO} from 'date-fns';
-import ReactSelect from 'react-select';
 import {useAuth} from '../AuthContext.js';
 
 
@@ -27,12 +26,8 @@ const BookingUpdateModal = ({isOpen, setIsOpen, bookingId, bookingDetails, servi
     useEffect(() => {
         if (bookingDetails) {
 
-            const timeFrom = new Date(bookingDetails.booking.time_from);
-            const timeTo = new Date(bookingDetails.booking.time_to);
-            setTimeFrom(timeFrom);
-            setTimeTo(timeTo);
-
-
+            setTimeFrom(new Date(bookingDetails.booking.time_from));
+            setTimeTo(new Date(bookingDetails.booking.time_to));
             setStatus(bookingDetails.booking.status);
 
 
@@ -42,10 +37,7 @@ const BookingUpdateModal = ({isOpen, setIsOpen, bookingId, bookingDetails, servi
                 duration: service.duration,
             }));
             setSelectedServices(selectedServices);
-
-
-            const selectedServiceIds = selectedServices.map(service => service.id.toString());
-            setSelectedServiceIds(selectedServiceIds);
+            setSelectedServiceIds(selectedServices.map(service => service.id.toString()));
         }
     }, [bookingDetails]); // Dependency array includes bookingDetails to re-run this effect when bookingDetails changes
 
@@ -91,7 +83,7 @@ const BookingUpdateModal = ({isOpen, setIsOpen, bookingId, bookingDetails, servi
                     booking: {
                         time_from: timeFrom.toISOString(),
                         time_to: timeTo.toISOString(),
-                        status: status
+                        status: status,
                     },
                     service_ids: selectedServiceIds
                 })
