@@ -95,8 +95,8 @@ const BookingUpdateModal = ({isOpen, setIsOpen, bookingId, bookingDetails, servi
                 },
                 body: JSON.stringify({
                     booking: {
-                        time_from: toISOStringAndAddHours(timeFrom, 5),
-                        time_to: toISOStringAndAddHours(timeTo, 5),
+                        time_from: timeFrom,
+                        time_to: timeTo.toISOString(),
                         status: status,
                     },
                     service_ids: selectedServiceIds
