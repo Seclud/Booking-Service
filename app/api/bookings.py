@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import List
 from zoneinfo import ZoneInfo
 
@@ -9,7 +9,7 @@ from app.api.deps import CurrentUser, SessionDep, get_current_active_superuser
 from app.core.celery_utils import send_booking_reminder
 from app.crud.booking import get_bookings
 from app.crud.lift import get_lift
-from app.models import Booking, BookingCreate, BookingUpdate, Message, Services, BookingServices, Lift, CarService
+from app.models import Booking, BookingCreate, BookingUpdate, Message, Services, BookingServices
 from app.utils.booking_utils import convert_to_timezone, check_existing_bookings
 
 router = APIRouter()
@@ -95,6 +95,8 @@ def update_booking(session: SessionDep, id: int, booking: BookingUpdate, current
 
     if time_from_aware > time_to_aware:
         raise HTTPException(status_code=400, detail="Время конца должно быть больше времени начала")
+    if time_from_aware < datetime.now(ZoneInfo('Asia/Yekaterinburg')) and not current_user.is_superuser:
+        raise HTTPException(status_code=400, detail="Время начала не может быть в прошлом")
 
     update_data = booking.model_dump(exclude_unset=True)
     db_booking.sqlmodel_update(update_data, update={"time_from": time_from_aware, "time_to": time_to_aware})
