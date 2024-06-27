@@ -95,7 +95,7 @@ def update_booking(session: SessionDep, id: int, booking: BookingUpdate, current
 
     if time_from_aware > time_to_aware:
         raise HTTPException(status_code=400, detail="Время конца должно быть больше времени начала")
-    if time_from_aware < datetime.now(ZoneInfo('Asia/Yekaterinburg')) and not current_user.is_superuser:
+    if time_from_aware < datetime.now(ZoneInfo('Asia/Yekaterinburg')) and not current_user.is_superuser and booking.status != "cancelled":
         raise HTTPException(status_code=400, detail="Время начала не может быть в прошлом")
 
     update_data = booking.model_dump(exclude_unset=True)
