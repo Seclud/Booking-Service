@@ -38,6 +38,7 @@ export default function LifeCreateModal(props) {
             })
             navigate('/garage/' + carservice_id);
             props.setIsOpen(false);
+            setName('');
         } catch (error) {
             console.error('Error creating post:', error);
             setErrorMessage(error.message);

@@ -38,6 +38,8 @@ export default function GarageCreateModal(props) {
             })
             navigate('/garages');
             props.setIsOpen(false);
+            setDescription('');
+            setName('');
         } catch (error) {
             console.error('Error creating CarService:', error);
             setErrorMessage(error.message);

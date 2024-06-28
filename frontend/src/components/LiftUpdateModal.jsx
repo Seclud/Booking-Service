@@ -54,7 +54,7 @@ export default function LifeCreateModal(props) {
                 justify="flex-start"
                 gap="md"
             >
-                <Title order={2} ta="center" mt="md">Создать пост</Title>
+                <Title order={2} ta="center" mt="md">Изменить пост</Title>
                 <TextInput
                     label="Название"
                     placeholder="Введите название поста"
