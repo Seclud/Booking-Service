@@ -1,5 +1,9 @@
 FROM node:16 as build
 WORKDIR /app
+
+ARG REACT_APP_LOAD_BALANCER_URL
+ENV REACT_APP_LOAD_BALANCER_URL=$REACT_APP_LOAD_BALANCER_URL
+
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . ./

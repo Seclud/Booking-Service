@@ -25,9 +25,10 @@ def parse_cors(v: Any) -> list[str] | str:
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=".env", env_ignore_empty=True, extra="ignore"
+        env_file="C:\\Users\\tihan\\PycharmProjects\\Booking-Service\\.env", env_ignore_empty=True, extra="ignore"
     )
-    API_V1_STR: str = "/api/v1"
+    API_V1_STR: str = ""  # Changed default to empty string
+    ROOT_PATH: str = ""  # Add ROOT_PATH setting
     #SECRET_KEY: str = secrets.token_urlsafe(32)
     SECRET_KEY: str
     # 60 minutes * 24 hours * 8 days = 8 days
@@ -93,7 +94,6 @@ class Settings(BaseSettings):
     FIRST_SUPERUSER_PASSWORD: str
     USERS_OPEN_REGISTRATION: bool = True
 
-
     REDIS_HOST: str
 
     RABBIT_USER: str
@@ -108,6 +108,15 @@ class Settings(BaseSettings):
 
     FRONTEND_HOST: str
     FRONTEND_PORT: str
+
+
+    # Yandex Object Storage Configuration
+    S3_ENDPOINT_URL: str = "https://storage.yandexcloud.net"
+    S3_ACCESS_KEY_ID: str | None = None
+    S3_SECRET_ACCESS_KEY: str | None = None
+    S3_BUCKET_STATIC: str | None = None
+    S3_BUCKET_UPLOADS: str | None = None
+    S3_REGION: str = "ru-central1"
 
 
 settings = Settings()

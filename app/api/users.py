@@ -42,13 +42,13 @@ def create_user(*, user: UserCreate, session: SessionDep):
         )
 
     created_user = create_user_crud(session=session, user_create=user)
-    confirmation_token = create_confirmation_token(created_user.id)
-    email_data = {
-        "subject": "Подтвердите свою почту",
-        "body": f"Перейдите по ссылке, чтобы подтвердить: http://{settings.FRONTEND_HOST}:{settings.FRONTEND_PORT}/email-confirmation/{confirmation_token}",
-        "to": created_user.email,
-    }
-    send_email.delay(email_data)
+    # confirmation_token = create_confirmation_token(created_user.id)
+    # email_data = {
+    #     "subject": "Подтвердите свою почту",
+    #     "body": f"Перейдите по ссылке, чтобы подтвердить: http://{settings.FRONTEND_HOST}:{settings.FRONTEND_PORT}/email-confirmation/{confirmation_token}",
+    #     "to": created_user.email,
+    # }
+    # send_email.delay(email_data)
     return created_user
 
 

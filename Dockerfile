@@ -1,18 +1,19 @@
 FROM python:3.12
 
-
 WORKDIR /app/
 
+# Copy requirements and install dependencies
 COPY ./requirements.txt /app/requirements.txt
-
-
 RUN pip install --no-cache-dir -r requirements.txt
 
 ENV PYTHONPATH=/app
 
+# Copy application code
 COPY ./app /app/app
-COPY start.sh /app/
 
+# Copy and setup start script
+COPY start.sh /app/start.sh
 RUN chmod +x /app/start.sh
-#CMD ["uvicorn", "app.main:app", "--proxy-headers", "--host", "0.0.0.0", "--port", "8000"]
-CMD ["/app/start.sh"]
+
+# Use exec form for CMD to ensure proper signal handling
+CMD ["/bin/bash", "/app/start.sh"]

@@ -1,4 +1,3 @@
-const SERVER_IP = process.env.REACT_APP_SERVER_IP;
-const SERVER_PORT = process.env.REACT_APP_SERVER_PORT;
+const REACT_APP_LOAD_BALANCER_URL = process.env.REACT_APP_LOAD_BALANCER_URL || 'http://localhost:8000'; // Default for local dev
 
-export const serverURL = `http://${SERVER_IP}:${SERVER_PORT}`;
+export const serverURL = `${REACT_APP_LOAD_BALANCER_URL}/api`;

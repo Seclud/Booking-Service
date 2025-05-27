@@ -15,7 +15,7 @@ from app.models import TokenPayload, User
 
 
 reusable_oauth2 = OAuth2PasswordBearer(
-    tokenUrl=f"/login/access-token"
+    tokenUrl=f"/api/login/access-token"
 )
 SECRET_KEY = settings.SECRET_KEY
 
