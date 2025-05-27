@@ -1,0 +1,131 @@
+#cloud-config
+
+# Backend container deployment for Booking Service
+# This script sets up Docker and runs the backend container from Yandex Container Registry
+# new version
+
+package_update: true
+package_upgrade: true
+
+packages:
+  - docker.io
+  - docker-compose
+  - curl
+  - jq
+
+groups:
+  - docker
+
+users:
+  - default
+  - name: app
+    groups: [docker, sudo]
+    shell: /bin/bash
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+
+runcmd:
+  # Start and enable Docker service
+  - systemctl start docker
+  - systemctl enable docker
+  
+  # Add ubuntu user to docker group
+  - usermod -aG docker ubuntu
+  - usermod -aG docker app
+    # Wait for Docker to be ready
+  - sleep 15
+    # Authenticate with Yandex Container Registry using OAuth token
+  - |
+    export PATH="/usr/local/bin:$PATH"
+    echo "OAUTH_KEY_HERE" | docker login --username oauth --password-stdin cr.yandex
+    
+    # Verify authentication worked
+    if [ $? -eq 0 ]; then
+      echo "Docker authentication successful"
+    else
+      echo "Docker authentication failed"
+      exit 1
+    fi
+  
+  # Create environment file for the backend
+  - |
+    cat > /opt/backend.env << 'EOF'
+    СЮДА СКОПИРОВАТЬ ВЕСЬ ENV ФАЙЛ
+    EOF
+  
+  # Create a Docker network for the backend services
+  - docker network create booking-network
+    # Pull required images
+  - |
+    
+    echo "Pulling backend image..."
+    docker pull cr.yandex/crpd0l8bb9kbi9j1gltv/booking-backend:latest
+    
+    if [ $? -ne 0 ]; then
+      echo "Failed to pull backend image, authentication might have failed"
+      exit 1
+    fi
+
+  # Run Redis container
+  - |
+    docker run -d \
+      --name redis \
+      --restart unless-stopped \
+      --network booking-network \
+      -p 6379:6379 \
+      redis:7-alpine redis-server --requirepass booking_redis_pass
+
+  # Wait for Redis to be ready
+  - sleep 10
+  
+  # Run the backend container
+  - |
+    docker run -d \
+      --name booking-backend \
+      --restart unless-stopped \
+      --network booking-network \
+      -p 8000:8000 \
+      --env-file /opt/backend.env \
+      --health-cmd="curl -f http://localhost:8000/health || exit 1" \
+      --health-interval=30s \
+      --health-timeout=10s \
+      --health-retries=3 \
+      cr.yandex/crpd0l8bb9kbi9j1gltv/booking-backend:latest
+  
+  # Wait for containers to be healthy
+  - sleep 30
+  
+  # Enable the systemd service
+  - systemctl enable booking-backend.service
+  
+  # Verify containers are running
+  - docker ps -a
+  - docker logs redis --tail 20
+  - docker logs booking-backend --tail 20
+  
+  # Test Redis connection
+  - docker exec redis redis-cli -a booking_redis_pass ping || echo "Redis connection test failed"
+  
+  # Test backend health endpoint
+  - sleep 10
+  - curl -f http://localhost:8000/health || echo "Backend health check failed"
+
+write_files:
+  - path: /etc/systemd/system/booking-backend.service
+    content: |
+      [Unit]
+      Description=Booking Service Backend Containers
+      Requires=docker.service
+      After=docker.service
+      
+      [Service]
+      Type=oneshot
+      RemainAfterExit=yes
+      ExecStart=/bin/bash -c 'docker start redis && sleep 5 && docker start booking-backend'
+      ExecStop=/bin/bash -c 'docker stop booking-backend && docker stop redis'
+      TimeoutStartSec=60
+      
+      [Install]
+      WantedBy=multi-user.target
+    permissions: '0644'
+
+final_message: "Backend container deployment completed. Redis and Backend containers should be running on the network."

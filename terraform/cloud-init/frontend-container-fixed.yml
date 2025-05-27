@@ -1,0 +1,104 @@
+#cloud-config
+
+# Frontend container deployment for Booking Service
+# This script sets up Docker and runs the frontend container from Yandex Container Registry
+
+package_update: true
+package_upgrade: true
+
+packages:
+  - docker.io
+  - docker-compose
+  - curl
+  - jq
+
+groups:
+  - docker
+
+users:
+  - default
+  - name: app
+    groups: [docker, sudo]
+    shell: /bin/bash
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+
+runcmd:
+  # Start and enable Docker service
+  - systemctl start docker
+  - systemctl enable docker
+  
+  # Add ubuntu user to docker group
+  - usermod -aG docker ubuntu
+  - usermod -aG docker app
+    # Wait for Docker to be ready
+  - sleep 15
+  
+  # Authenticate with Yandex Container Registry using OAuth token
+  - |
+    echo "OAUTH_KEY_HERE" | docker login --username oauth --password-stdin cr.yandex
+    
+    # Verify authentication worked
+    if [ $? -eq 0 ]; then
+      echo "Docker authentication successful"
+    else
+      echo "Docker authentication failed"
+      exit 1
+    fi
+    
+  # Pull frontend image
+  - |
+    echo "Pulling frontend image..."
+    docker pull cr.yandex/crpd0l8bb9kbi9j1gltv/booking-frontend:latest
+    
+    if [ $? -ne 0 ]; then
+      echo "Failed to pull frontend image, authentication might have failed"
+      exit 1
+    fi
+  
+  # Run the frontend container
+  - |
+    docker run -d \
+      --name booking-frontend \
+      --restart unless-stopped \
+      -p 80:80 \
+      -e REACT_APP_LOAD_BALANCER_URL="http://84.201.170.127" \
+      --health-cmd="curl -f http://localhost:80/ || exit 1" \
+      --health-interval=30s \
+      --health-timeout=10s \
+      --health-retries=3 \
+      cr.yandex/crpd0l8bb9kbi9j1gltv/booking-frontend:latest
+  
+  # Wait for container to be healthy
+  - sleep 30
+  
+  # Enable the systemd service
+  - systemctl enable booking-frontend.service
+  
+  # Verify container is running
+  - docker ps -a
+  - docker logs booking-frontend --tail 20
+  
+  # Test frontend endpoint
+  - sleep 10
+  - curl -f http://localhost:80/ || echo "Frontend health check failed"
+
+write_files:
+  - path: /etc/systemd/system/booking-frontend.service
+    content: |
+      [Unit]
+      Description=Booking Service Frontend Container
+      Requires=docker.service
+      After=docker.service
+      
+      [Service]
+      Type=oneshot
+      RemainAfterExit=yes
+      ExecStart=/usr/bin/docker start booking-frontend
+      ExecStop=/usr/bin/docker stop booking-frontend
+      TimeoutStartSec=60
+      
+      [Install]
+      WantedBy=multi-user.target
+    permissions: '0644'
+
+final_message: "Frontend container deployment completed. Container should be running on port 80."
