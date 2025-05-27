@@ -2,18 +2,18 @@
 # Copy this file to terraform.tfvars and fill in your values
 
 # Yandex Cloud Configuration
-cloud_id   = "b1gj1gflmr36ra1amhp1"
-folder_id  = "b1genr1h1gv0t4i93fdr"
+cloud_id   = "###"
+folder_id  = "###"
 
 # Environment settings
 environment = "dev"  # dev, staging, prod
 
 # Database credentials
 db_username = "booking_admin"
-db_password = "y4ndexstr0ngpassdb"
+db_password = "###"
 
 # Redis configuration
-redis_password = "y4ndexstr0ngpassred1s"
+redis_password = "###"
 
 # Application scaling
 app_instance_count = 2
